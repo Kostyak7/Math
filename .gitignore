@@ -1,0 +1,11 @@
+**/build
+**/.vs
+**/out/
+**/vcpkg_installed/
+**/cmake-build-*
+**/CMakeSettings.json
+**/configs/tmp/*
+**/launch.vs.json
+**/.idea
+**/configs/documentation/html
+workdir/*.txt

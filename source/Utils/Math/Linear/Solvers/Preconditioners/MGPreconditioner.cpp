@@ -1,0 +1,415 @@
+#include "MGPreconditioner.h"
+
+#include <Utils/Math/Linear/Solvers/GaussSystemSolver.h>
+#include <Utils/Math/Linear/Solvers/Preconditioners/ILUPreconditioner.h>
+#include <Utils/Math/Common.h>
+
+#include <algorithm>
+#include <stdexcept>
+
+class math::linal::MGPreconditioner::Impl : public math::linal::IPreconditioner::IImpl {
+public:
+    using Params = MGPreconditioner::Params;
+    using SmootherType = MGPreconditioner::SmootherType;
+    using CycleType = MGPreconditioner::CycleType;
+
+public:
+    Impl(const math::linal::AnyMatrix& matrix, const Params& params)
+        : m_params(params)
+        , m_matrix(matrix)
+    {
+    }
+
+    FVector apply(const FVector& x) const override {
+        if (check_levels()) return x;
+        FVector result(x.size(), 0.0);
+        switch (m_params.cycle_type) {
+        case CycleType::V_CYCLE: v_cycle(0, x, result); break;
+        case CycleType::W_CYCLE: w_cycle(0, x, result); break;
+        case CycleType::F_CYCLE: f_cycle(0, x, result); break;
+        }
+        return result;
+    }
+
+protected:
+    virtual bool check_levels() const = 0;
+
+    virtual void v_cycle(size_t level_idx, const FVector& rhs, FVector& x) const = 0;
+    virtual void w_cycle(size_t level_idx, const FVector& rhs, FVector& x) const = 0;
+    virtual void f_cycle(size_t level_idx, const FVector& rhs, FVector& x) const = 0;
+
+    void coarse_sovler_init() {
+        m_coarse_solver = std::make_unique<math::linal::GaussLinearSystemSolver>();
+    }
+
+    FVector coarse_solution(const FVector& rhs) const {
+        return m_coarse_solver->solve(m_matrix, rhs);
+    }
+
+protected:
+    Params m_params;
+    
+private:
+    const AnyMatrix& m_matrix;
+    std::unique_ptr<math::linal::ILinearSystemSolver> m_coarse_solver;
+};
+
+namespace {
+
+    class BandImpl final : public math::linal::MGPreconditioner::Impl {
+        using Matrix = math::linal::BandMatrix;
+        using Vector = math::linal::FVector;
+
+    public:
+        BandImpl(const Matrix& matrix, const Params& params)
+            : Impl(matrix, params)
+        {
+            m_levels.clear();
+            m_levels.push_back(matrix);
+
+            // Создаем иерархию уровней
+            while (m_levels.back().get_width() > m_params.min_coarse_size && m_levels.size() < m_params.max_levels) {
+                Matrix coarse = create_coarse_matrix(m_levels.back());
+                m_levels.push_back(coarse);
+            }
+
+            coarse_sovler_init();
+        }
+
+    private:
+        bool check_levels() const override {
+            return !m_levels.empty() && m_levels.back().get_width() <= m_params.min_coarse_size;
+        }
+
+        void v_cycle(size_t level_idx, const Vector& rhs, Vector& x) const override {
+            if (level_idx == m_levels.size() - 1) {
+                x = coarse_solution(rhs);
+                return;
+            }
+
+            const Matrix& A = m_levels[level_idx];
+
+            // Предварительное сглаживание
+            for (size_t i = 0; i < m_params.n_pre_smooth; ++i) {
+                smooth(A, rhs, x, level_idx);
+            }
+
+            Vector residual = rhs - A * x;
+
+            // Ограничение невязки на более грубый уровень
+            Vector coarse_rhs = restrict(residual, level_idx);
+            Vector coarse_correction(coarse_rhs.size(), 0.0);
+
+            // Рекурсивный вызов для более грубого уровня
+            v_cycle(level_idx + 1, coarse_rhs, coarse_correction);
+
+            // Интерполяция коррекции на более тонкий уровень
+            Vector correction = interpolate(coarse_correction, level_idx);
+            x += correction;
+
+            // Пост-сглаживание
+            for (size_t i = 0; i < m_params.n_post_smooth; ++i) {
+                smooth(A, rhs, x, level_idx);
+            }
+        }
+
+        void w_cycle(size_t level_idx, const Vector& rhs, Vector& x) const override {
+            if (level_idx == m_levels.size() - 1) {
+                x = coarse_solution(rhs);
+                return;
+            }
+
+            const Matrix& A = m_levels[level_idx];
+
+            // Предварительное сглаживание
+            for (size_t i = 0; i < m_params.n_pre_smooth; ++i) {
+                smooth(A, rhs, x, level_idx);
+            }
+
+            Vector residual = rhs - A * x;
+
+            // Ограничение невязки на более грубый уровень
+            Vector coarse_rhs = restrict(residual, level_idx);
+            Vector coarse_correction(coarse_rhs.size(), 0.0);
+
+            // Два рекурсивных вызова для более грубого уровня (W-цикл)
+            w_cycle(level_idx + 1, coarse_rhs, coarse_correction);
+            w_cycle(level_idx + 1, coarse_rhs, coarse_correction);
+
+            // Интерполяция коррекции на более тонкий уровень
+            Vector correction = interpolate(coarse_correction, level_idx);
+            x += correction;
+
+            // Пост-сглаживание
+            for (size_t i = 0; i < m_params.n_post_smooth; ++i) {
+                smooth(A, rhs, x, level_idx);
+            }
+        }
+
+        void f_cycle(size_t level_idx, const Vector& rhs, Vector& x) const override {
+            if (level_idx == m_levels.size() - 1) {
+                x = coarse_solution(rhs);
+                return;
+            }
+
+            const Matrix& A = m_levels[level_idx];
+
+            // Предварительное сглаживание
+            for (size_t i = 0; i < m_params.n_pre_smooth; ++i) {
+                smooth(A, rhs, x, level_idx);
+            }
+
+            Vector residual = rhs - A * x;
+
+            // Ограничение невязки на более грубый уровень
+            Vector coarse_rhs = restrict(residual, level_idx);
+            Vector coarse_correction(coarse_rhs.size(), 0.0);
+
+            // Рекурсивный вызов F-цикла для более грубого уровня
+            f_cycle(level_idx + 1, coarse_rhs, coarse_correction);
+
+            // Интерполяция коррекции на более тонкий уровень
+            Vector correction = interpolate(coarse_correction, level_idx);
+            x += correction;
+
+            // Дополнительное сглаживание и V-цикл
+            for (size_t i = 0; i < m_params.n_post_smooth; ++i) {
+                smooth(A, rhs, x, level_idx);
+            }
+
+            residual = rhs - A * x;
+            coarse_rhs = restrict(residual, level_idx);
+            coarse_correction.assign(coarse_rhs.size(), 0.0);
+            v_cycle(level_idx + 1, coarse_rhs, coarse_correction);
+            correction = interpolate(coarse_correction, level_idx);
+            x += correction;
+
+            // Финальное пост-сглаживание
+            for (size_t i = 0; i < m_params.n_post_smooth; ++i) {
+                smooth(A, rhs, x, level_idx);
+            }
+        }
+
+        Matrix create_coarse_matrix(const Matrix& fine) {
+            // Здесь должна быть реализация создания грубой матрицы
+            // Например, используя геометрическую или алгебраическую многосеточную методику
+            // В упрощенном виде можно просто взять каждую вторую точку
+
+            size_t n = fine.get_width();
+            size_t coarse_n = (n + 1) / 2;
+            Matrix coarse(coarse_n);
+
+            // Новая ширина ленты на грубом уровне (можно уменьшить, но не меньше 1)
+            size_t coarse_isl = std::max<size_t>(1, fine.get_isl() / 2);
+            coarse.set_isl(coarse_isl);
+
+            for (size_t i = 0; i < coarse_n; ++i) {
+                size_t fine_i = 2 * i;
+                if (fine_i >= n) break;
+
+                // Обрабатываем только элементы в пределах новой ленты coarse[i]
+                for (size_t j = i; j < std::min(i + coarse_isl, coarse_n); ++j) {
+                    size_t fine_j = 2 * j;
+                    if (fine_j >= n) break;
+
+                    // Проверяем, что fine_j - fine_i в пределах ленты fine_i
+                    size_t band_offset = fine_j - fine_i;
+                    if (band_offset < fine[fine_i].size()) {
+                        coarse[i][j - i] = fine[fine_i][band_offset];
+                    }
+                    // Иначе оставляем 0 (вне ленты)
+                }
+            }
+
+            return coarse;
+        }
+
+        Vector restrict(const Vector& fine, size_t level_idx) const {
+            // Простая инъекция - берем каждую вторую точку
+            const Matrix& fine_matrix = m_levels[level_idx];
+            size_t coarse_n = m_levels[level_idx + 1].get_width();
+            Vector coarse(coarse_n, 0.0);
+
+            for (size_t i = 0; i < coarse_n; ++i) {
+                size_t fine_i = 2 * i;
+                if (fine_i < fine_matrix.get_width()) {
+                    coarse[i] = fine[fine_i];
+                }
+            }
+
+            return coarse;
+        }
+
+        Vector interpolate(const Vector& coarse, size_t level_idx) const {
+            // Линейная интерполяция
+            size_t fine_size = m_levels[level_idx].get_width();
+            Vector fine(fine_size, 0.0);
+
+            for (size_t i = 0; i < coarse.size(); ++i) {
+                if (2 * i < fine_size) {
+                    fine[2 * i] = coarse[i];
+                }
+                if (2 * i + 1 < fine_size && i + 1 < coarse.size()) {
+                    fine[2 * i + 1] = 0.5 * (coarse[i] + coarse[i + 1]);
+                }
+            }
+
+            return fine;
+        }
+
+        void smooth(const Matrix& A, const Vector& rhs, Vector& x, size_t level_idx) const {
+            switch (m_params.smoother_type) {
+            case SmootherType::JACOBI:
+                jacobi_smooth(A, rhs, x);
+                break;
+            case SmootherType::GAUSS_SEIDEL:
+                gauss_seidel_smooth(A, rhs, x);
+                break;
+            case SmootherType::ILU0:
+                ilu0_smooth(A, rhs, x, level_idx);
+                break;
+            }
+        }
+
+        void jacobi_smooth(const Matrix& A, const Vector& rhs, Vector& x) const {
+            Vector new_x = x;
+            size_t isl = A.get_isl();  // Полуширина ленты
+            size_t n = A.get_width();
+
+            for (size_t i = 0; i < n; ++i) {
+                double sum = 0.0;
+                double diag = A[i][0];  // Диагональный элемент
+
+                // Элементы над диагональю (хранятся в BandMatrix)
+                for (size_t j = 1; j <= isl && i + j < n; ++j) {
+                    sum += A[i][j] * x[i + j];
+                }
+
+                // Элементы под диагональю (используем симметрию)
+                for (size_t j = 1; j <= isl && i >= j; ++j) {
+                    sum += A[i - j][j] * x[i - j];  // A[i-j][j] == A[i][j] (симметрия)
+                }
+
+                new_x[i] = (rhs[i] - sum) / diag;
+            }
+
+            x = new_x;
+        }
+
+        void gauss_seidel_smooth(const Matrix& A, const Vector& rhs, Vector& x) const {
+            const size_t isl = A.get_isl();
+            for (size_t i = 0; i < A.get_height(); ++i) {
+                double sum = 0.0;
+                double diag = A[i][0]; // диагональный элемент
+
+                // Учитываем только элементы над диагональю (уже обновленные)
+                for (size_t j = 1; j < isl; ++j) {
+                    size_t col = i + j;
+                    if (col < A.get_width()) {
+                        sum += A[i][j] * x[col];
+                    }
+                }
+
+                // Симметричная часть (нижний треугольник не хранится)
+                for (size_t j = 1; j < isl; ++j) {
+                    size_t row = i - j;
+                    if (row < A.get_height()) {
+                        sum += A[row][j] * x[row];
+                    }
+                }
+
+                x[i] = (rhs[i] - sum) / diag;
+            }
+        }
+
+        void ilu0_smooth(const Matrix& A, const Vector& rhs, Vector& x, size_t level_idx) const {
+            // Упрощенная реализация ILU(0) сглаживания
+            // В реальной реализации нужно предварительно вычислить ILU разложение
+
+            // Здесь просто используем GS сглаживание как пример
+            gauss_seidel_smooth(A, rhs, x);
+        }
+
+    private:
+        Params m_params;
+        std::vector<Matrix> m_levels;
+    };
+
+    class DenseImpl final : public math::linal::MGPreconditioner::Impl {
+        using Matrix = math::linal::DenseMatrix;
+        using Vector = math::linal::FVector;
+
+    public:
+        DenseImpl(const Matrix& matrix, const Params& params)
+            : Impl(matrix, params)
+        {
+            // ...
+        }
+
+    private:
+        bool check_levels() const override {
+            return true;
+        }
+
+        void v_cycle(size_t level_idx, const Vector& rhs, Vector& x) const override {
+            // ...
+        }
+
+        void w_cycle(size_t level_idx, const Vector& rhs, Vector& x) const override {
+            // ...
+        }
+
+        void f_cycle(size_t level_idx, const Vector& rhs, Vector& x) const override {
+            // ...
+        }
+    };
+
+    class SparseImpl final : public math::linal::MGPreconditioner::Impl {
+        using Matrix = math::linal::SparseMatrix;
+        using Vector = math::linal::FVector;
+
+    public:
+        SparseImpl(const Matrix& matrix, const Params& params)
+            : Impl(matrix, params)
+        {
+            // ...
+        }
+
+    private:
+        bool check_levels() const override {
+            return true;
+        }
+
+        void v_cycle(size_t level_idx, const Vector& rhs, Vector& x) const override {
+            // ...
+        }
+
+        void w_cycle(size_t level_idx, const Vector& rhs, Vector& x) const override {
+            // ...
+        }
+
+        void f_cycle(size_t level_idx, const Vector& rhs, Vector& x) const override {
+            // ...
+        }
+    };
+
+} // namespace
+
+math::linal::MGPreconditioner::MGPreconditioner(const Params& params)
+    : m_params(params) {
+}
+
+void math::linal::MGPreconditioner::init(const AnyMatrix& matrix) {
+    if (std::holds_alternative<BandMatrix>(matrix)) {
+        m_impl = std::make_unique<BandImpl>(std::get<BandMatrix>(matrix), m_params);
+    }
+    else if (std::holds_alternative<DenseMatrix>(matrix)) {
+        m_impl = std::make_unique<DenseImpl>(std::get<DenseMatrix>(matrix), m_params);
+    }
+    else if (std::holds_alternative<SparseMatrix>(matrix)) {
+        m_impl = std::make_unique<SparseImpl>(std::get<SparseMatrix>(matrix), m_params);
+    }
+    else {
+        throw std::runtime_error("Unsupported matrix type for MG preconditioner");
+    }
+}

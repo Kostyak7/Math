@@ -1,0 +1,14 @@
+{
+  "dependencies": [
+    "gtest"
+  ],
+  "builtin-baseline": "f523208df4ae467436dc2d2eeab594fed240d552",
+
+  "overrides": [
+    
+    {
+      "name": "nlohmann-json",
+      "version": "3.11.3"
+    }
+  ]
+}
