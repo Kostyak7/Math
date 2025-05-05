@@ -226,21 +226,21 @@ namespace tests {
 
 		std::vector<std::shared_ptr<SolverTester<TMatrix>>> testers{
 			//create_solver_tester(slaes, SolverFactory::SolverName::Gauss,    SolverFactory::PredictionerName::None, params), // +
-			//create_solver_tester(slaes, SolverFactory::SolverName::BiCGSTAB, SolverFactory::PredictionerName::None, params), // +
-			//create_solver_tester(slaes, SolverFactory::SolverName::CG,       SolverFactory::PredictionerName::None, params), // +
-			//create_solver_tester(slaes, SolverFactory::SolverName::FGMRES,   SolverFactory::PredictionerName::None, params), // +
-			//create_solver_tester(slaes, SolverFactory::SolverName::GMRES,    SolverFactory::PredictionerName::None, params), // +
-			//create_solver_tester(slaes, SolverFactory::SolverName::MINRES,   SolverFactory::PredictionerName::None, params), // +
+			create_solver_tester(slaes, SolverFactory::SolverName::BiCGSTAB, SolverFactory::PredictionerName::None, params), // +
+			create_solver_tester(slaes, SolverFactory::SolverName::CG,       SolverFactory::PredictionerName::None, params), // +
+			create_solver_tester(slaes, SolverFactory::SolverName::FGMRES,   SolverFactory::PredictionerName::None, params), // +
+			create_solver_tester(slaes, SolverFactory::SolverName::GMRES,    SolverFactory::PredictionerName::None, params), // +
+			create_solver_tester(slaes, SolverFactory::SolverName::MINRES,   SolverFactory::PredictionerName::None, params), // +
 			//create_solver_tester(slaes, SolverFactory::SolverName::SOR,      SolverFactory::PredictionerName::None, params), // -
 			// 
-			//create_solver_tester(slaes, SolverFactory::SolverName::BiCGSTAB, SolverFactory::PredictionerName::JACOBI, params), // +
-			//create_solver_tester(slaes, SolverFactory::SolverName::CG,       SolverFactory::PredictionerName::JACOBI, params), // +
-			//create_solver_tester(slaes, SolverFactory::SolverName::FGMRES,   SolverFactory::PredictionerName::JACOBI, params), // +
-			//create_solver_tester(slaes, SolverFactory::SolverName::GMRES,    SolverFactory::PredictionerName::JACOBI, params), // +
-			//create_solver_tester(slaes, SolverFactory::SolverName::MINRES,   SolverFactory::PredictionerName::JACOBI, params), // +
+			create_solver_tester(slaes, SolverFactory::SolverName::BiCGSTAB, SolverFactory::PredictionerName::JACOBI, params), // +
+			create_solver_tester(slaes, SolverFactory::SolverName::CG,       SolverFactory::PredictionerName::JACOBI, params), // +
+			create_solver_tester(slaes, SolverFactory::SolverName::FGMRES,   SolverFactory::PredictionerName::JACOBI, params), // +
+			create_solver_tester(slaes, SolverFactory::SolverName::GMRES,    SolverFactory::PredictionerName::JACOBI, params), // +
+			create_solver_tester(slaes, SolverFactory::SolverName::MINRES,   SolverFactory::PredictionerName::JACOBI, params), // +
 			//create_solver_tester(slaes, SolverFactory::SolverName::SOR,      SolverFactory::PredictionerName::JACOBI, params), // -
 			// 
-			//create_solver_tester(slaes, SolverFactory::SolverName::BiCGSTAB, SolverFactory::PredictionerName::ILU, params), // +
+			//create_solver_tester(slaes, SolverFactory::SolverName::BiCGSTAB, SolverFactory::PredictionerName::ILU, params), // +ё
 			//create_solver_tester(slaes, SolverFactory::SolverName::CG,       SolverFactory::PredictionerName::ILU, params), // -
 			//create_solver_tester(slaes, SolverFactory::SolverName::FGMRES,   SolverFactory::PredictionerName::ILU, params), // +
 			//create_solver_tester(slaes, SolverFactory::SolverName::GMRES,    SolverFactory::PredictionerName::ILU, params), // +- иногда верно, иногда не точно, а иногда исключение в solve_H_system
@@ -248,14 +248,14 @@ namespace tests {
 			//create_solver_tester(slaes, SolverFactory::SolverName::SOR,      SolverFactory::PredictionerName::ILU, params), // -
 			// 
 			create_solver_tester(slaes, SolverFactory::SolverName::BiCGSTAB, SolverFactory::PredictionerName::MG, params), // +
-			create_solver_tester(slaes, SolverFactory::SolverName::CG,       SolverFactory::PredictionerName::MG, params), // +
-			create_solver_tester(slaes, SolverFactory::SolverName::FGMRES,   SolverFactory::PredictionerName::MG, params), // +
-			create_solver_tester(slaes, SolverFactory::SolverName::GMRES,    SolverFactory::PredictionerName::MG, params), // +
-			create_solver_tester(slaes, SolverFactory::SolverName::MINRES,   SolverFactory::PredictionerName::MG, params), // +
+			//create_solver_tester(slaes, SolverFactory::SolverName::CG,       SolverFactory::PredictionerName::MG, params), // +
+			//create_solver_tester(slaes, SolverFactory::SolverName::FGMRES,   SolverFactory::PredictionerName::MG, params), // +
+			//create_solver_tester(slaes, SolverFactory::SolverName::GMRES,    SolverFactory::PredictionerName::MG, params), // +
+			//create_solver_tester(slaes, SolverFactory::SolverName::MINRES,   SolverFactory::PredictionerName::MG, params), // +
 			//create_solver_tester(slaes, SolverFactory::SolverName::SOR,      SolverFactory::PredictionerName::MG, params), // -
 		};
 
-		TestRunner<TMatrix>::Params runner_params{ false, TestRunner<TMatrix>::SaveType::None };
+		TestRunner<TMatrix>::Params runner_params{ false, TestRunner<TMatrix>::SaveType::OnlyTime };
 		TestRunner<TMatrix>::run("one_random_test", testers, runner_params);
 	}
 

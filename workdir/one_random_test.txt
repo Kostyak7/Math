@@ -1,0 +1,44 @@
+Solver: CG+JACOBI
+time: 
+907.154, 	
+
+Solver: BiCGSTAB
+time: 
+881.064, 	
+
+Solver: MINRES
+time: 
+952.664, 	
+
+Solver: CG
+time: 
+239.698, 	
+
+Solver: BiCGSTAB+JACOBI
+time: 
+1233.36, 	
+
+Solver: FGMRES
+time: 
+1088.52, 	
+
+Solver: GMRES
+time: 
+1088.1, 	
+
+Solver: FGMRES+JACOBI
+time: 
+1084.98, 	
+
+Solver: GMRES+JACOBI
+time: 
+1092.37, 	
+
+Solver: MINRES+JACOBI
+time: 
+941.317, 	
+
+Solver: BiCGSTAB+MG
+time: 
+844.772, 	
+

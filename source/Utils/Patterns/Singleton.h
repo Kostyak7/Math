@@ -8,7 +8,7 @@ namespace pattern {
     class Singleton : public MoveOnlyBase {
     public:
         static DerivedT& Instance() {
-            static DerivedT instance;
+            thread_local DerivedT instance;
             return instance;
         }
 

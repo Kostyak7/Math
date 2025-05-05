@@ -122,11 +122,11 @@ typename tests::SolverTester<TMatrix>::TestResult tests::SolverTester<TMatrix>::
 template <class TMatrix>
 void tests::SolverTester<TMatrix>::print_test_result(const TestResult& res) const {
 	if (m_params.print_slae) {
-		std::cout << "A = \n";
-		print_matrix(m_slaes[res.index].A);
+		//std::cout << "A = \n";
+		//print_matrix(m_slaes[res.index].A);
 
-		std::cout << "\nb = ";
-		print_vector(m_slaes[res.index].b);
+		//std::cout << "\nb = ";
+		//print_vector(m_slaes[res.index].b);
 
 		if (m_slaes[res.index].solution.size()) {
 			std::cout << "\n\ns = ";
