@@ -4,66 +4,13 @@
 
 #include <stdexcept>
 
-math::linal::DenseMatrix::ProxyVector::ProxyVector(FVector& vector)
-    : m_vector(vector)
-{
-}
-
-const math::linal::DenseMatrix::value_type& math::linal::DenseMatrix::ProxyVector::operator[](size_t i) const {
-    return m_vector[i];
-}
-
-math::linal::DenseMatrix::value_type& math::linal::DenseMatrix::ProxyVector::operator[](size_t i) {
-    return m_vector[i];
-}
-
 math::linal::DenseMatrix::DenseMatrix(size_t height, size_t width, const value_type& default_value)
-    : m_data(height, FVector(width, default_value))
+    : vector(height, FVector(width, default_value))
 {
-}
-
-math::linal::DenseMatrix::DenseMatrix(size_t height, const FVector& default_value)
-    : m_data(height, default_value)
-{
-}
-
-math::linal::DenseMatrix::DenseMatrix(const DenseMatrix& matrix)
-    : m_data(matrix.m_data)
-{
-}
-
-math::linal::DenseMatrix::DenseMatrix(DenseMatrix&& matrix) noexcept {
-    swap(std::move(matrix));
-}
-
-math::linal::DenseMatrix::DenseMatrix(std::initializer_list<value_type> list)
-    : m_data(list.begin(), list.end())
-{
-}
-
-math::linal::DenseMatrix::DenseMatrix(std::initializer_list<std::initializer_list<value_type>> list) {
-    for (const auto& row : list) {
-        m_data.insert(m_data.end(), row.begin(), row.end());
-    }
-}
-
-math::linal::DenseMatrix& math::linal::DenseMatrix::operator=(const DenseMatrix& other) {
-    if (this == &other)
-        return *this;
-    m_data = other.m_data;
-    return *this;
-}
-
-math::linal::DenseMatrix& math::linal::DenseMatrix::operator=(DenseMatrix&& other) {
-    if (this == &other)
-        return *this;
-    swap(other);
-    return *this;
-
 }
 
 math::linal::DenseMatrix& math::linal::DenseMatrix::operator*=(value_type scalar) noexcept {
-    for (auto& vec : m_data) {
+    for (auto& vec : *this) {
         vec *= scalar;
     }
     return *this;
@@ -77,7 +24,7 @@ math::linal::DenseMatrix& math::linal::DenseMatrix::operator+=(const DenseMatrix
     if (get_width() != other.get_width() || get_height() != other.get_height())
         throw std::invalid_argument("The matrices must be the same size");
     for (size_t r = 0; r < get_height(); ++r) {
-        m_data[r] += other[r];
+        (*this)[r] += other[r];
     }
     return *this;
 }
@@ -86,7 +33,7 @@ math::linal::DenseMatrix& math::linal::DenseMatrix::operator-=(const DenseMatrix
     if (get_width() != other.get_width() || get_height() != other.get_height())
         throw std::invalid_argument("The matrices must be the same size");
     for (size_t r = 0; r < get_height(); ++r) {
-        m_data[r] -= other[r];
+        (*this)[r] -= other[r];
     }
     return *this;
 }
@@ -104,18 +51,18 @@ bool math::linal::DenseMatrix::is_positive_definite() const {
         for (size_t j = 0; j <= i; ++j) {
             value_type sum = 0;
             for (size_t k = 0; k < j; ++k) {
-                sum += L.m_data[i][k] * L.m_data[j][k];
+                sum += L[i][k] * L[j][k];
             }
 
             if (i == j) {
-                value_type diag = m_data[i][i] - sum;
+                value_type diag = (*this)[i][i] - sum;
                 if (diag <= 0) 
                     return false; 
 
-                L.m_data[i][i] = std::sqrt(diag);
+                L[i][i] = std::sqrt(diag);
             }
             else {
-                L.m_data[i][j] = (m_data[i][j] - sum) / L.m_data[j][j];
+                L[i][j] = ((*this)[i][j] - sum) / L[j][j];
             }
         }
     }
@@ -125,33 +72,24 @@ bool math::linal::DenseMatrix::is_positive_definite() const {
 math::linal::DenseMatrix::value_type math::linal::DenseMatrix::get(size_t row, size_t col) const {
     if (row >= get_height() || col >= get_width())
         throw std::invalid_argument("Going beyond the boundaries of the matrix");
-    return m_data[row][col];
+    return (*this)[row][col];
 }
 
 void math::linal::DenseMatrix::set(size_t row, size_t col, value_type value) {
     if (row >= get_height() || col >= get_width())
         throw std::invalid_argument("Going beyond the boundaries of the matrix");
-    m_data[row][col] = value;
+    (*this)[row][col] = value;
 }
 
 size_t math::linal::DenseMatrix::get_width() const {
-    return m_data.at(0).size();
+    if (empty()) {
+        return 0;
+    }
+    return at(0).size();
 }
 
 size_t math::linal::DenseMatrix::get_height() const {
-    return m_data.size();
-}
-
-const math::linal::FVector& math::linal::DenseMatrix::operator[](size_t row) const {
-    return m_data[row];
-}
-
-math::linal::DenseMatrix::ProxyVector math::linal::DenseMatrix::operator[](size_t row) {
-    return { m_data[row] };
-}
-
-void math::linal::DenseMatrix::clear() {
-    m_data.clear();
+    return size();
 }
 
 math::linal::DenseMatrix::value_type math::linal::DenseMatrix::det() const {
@@ -161,8 +99,8 @@ math::linal::DenseMatrix::value_type math::linal::DenseMatrix::det() const {
 
     size_t n = get_width();
     if (n == 0) return 0.0;
-    if (n == 1) return m_data[0][0];
-    if (n == 2) return m_data[0][0] * m_data[1][1] - m_data[0][1] * m_data[1][0];
+    if (n == 1) return (*this)[0][0];
+    if (n == 2) return (*this)[0][0] * (*this)[1][1] - (*this)[0][1] * (*this)[1][0];
 
     DenseMatrix temp(*this);
     value_type det = 1.0;
@@ -170,25 +108,25 @@ math::linal::DenseMatrix::value_type math::linal::DenseMatrix::det() const {
     for (size_t i = 0; i < n; ++i) {
         size_t pivot = i;
         for (size_t j = i + 1; j < n; ++j) {
-            if (fabs(temp.m_data[j][i]) > fabs(temp.m_data[pivot][i])) {
+            if (fabs(temp[j][i]) > fabs(temp[pivot][i])) {
                 pivot = j;
             }
         }
 
         if (pivot != i) {
-            std::swap(temp.m_data[i], temp.m_data[pivot]);
+            std::swap(temp[i], temp[pivot]);
             det = -det;
         }
 
-        if (temp.m_data[i][i] == 0) 
+        if (temp[i][i] == 0) 
             return 0.0;
 
-        det *= temp.m_data[i][i];
+        det *= temp[i][i];
 
         for (size_t j = i + 1; j < n; ++j) {
-            value_type factor = temp.m_data[j][i] / temp.m_data[i][i];
+            value_type factor = temp[j][i] / temp[i][i];
             for (size_t k = i + 1; k < n; ++k) {
-                temp.m_data[j][k] -= factor * temp.m_data[i][k];
+                temp[j][k] -= factor * temp[i][k];
             }
         }
     }
@@ -212,25 +150,15 @@ std::vector<std::pair<math::linal::DenseMatrix::complex_value_type, std::vector<
 math::linal::DenseMatrix math::linal::DenseMatrix::identity_matrix(size_t n) {
     DenseMatrix res(n, n);
     for (size_t i = 0; i < n; ++i) {
-        res.m_data[i][i] = 1.0;
+        res[i][i] = 1.0;
     }
     return res;
 }
 
-const std::vector<math::linal::FVector>& math::linal::DenseMatrix::data() const {
-    return m_data;
-}
-
-std::vector<math::linal::FVector>& math::linal::DenseMatrix::data() {
-    return m_data;
-}
-
-void math::linal::DenseMatrix::swap(DenseMatrix& other) noexcept {
-    std::swap(m_data, other.m_data);
-}
-
-void math::linal::swap(DenseMatrix& m1, DenseMatrix& m2) noexcept {
-    m1.swap(m2);
+math::linal::DenseMatrix math::linal::DenseMatrix::elementary_matrix_unit(size_t n, size_t m, size_t i, size_t j) {
+    DenseMatrix res(n, m);
+    res.set(i, j, 1.0);
+    return res;
 }
 
 math::linal::DenseMatrix math::linal::operator*(const DenseMatrix& matrix, DenseMatrix::value_type scalar) {
@@ -346,33 +274,33 @@ math::linal::DenseMatrix math::linal::inversed(const DenseMatrix& matrix) {
     for (size_t i = 0; i < n; ++i) {
         size_t pivot = i;
         for (size_t j = i + 1; j < n; ++j) {
-            if (std::abs(temp.m_data[j][i]) > std::abs(temp.m_data[pivot][i])) {
+            if (std::abs(temp[j][i]) > std::abs(temp[pivot][i])) {
                 pivot = j;
             }
         }
 
         if (pivot != i) {
-            std::swap(temp.m_data[i], temp.m_data[pivot]);
-            std::swap(inverse.m_data[i], inverse.m_data[pivot]);
+            std::swap(temp[i], temp[pivot]);
+            std::swap(inverse[i], inverse[pivot]);
         }
 
-        if (temp.m_data[i][i] == 0) {
+        if (temp[i][i] == 0) {
             throw std::runtime_error("Matrix is singular and cannot be inverted");
         }
 
-        DenseMatrix::value_type diag = temp.m_data[i][i];
+        DenseMatrix::value_type diag = temp[i][i];
         for (size_t j = 0; j < n; ++j) {
-            temp.m_data[i][j] /= diag;
-            inverse.m_data[i][j] /= diag;
+            temp[i][j] /= diag;
+            inverse[i][j] /= diag;
         }
 
         // Исключение элементов в столбце
         for (size_t k = 0; k < n; ++k) {
-            if (k != i && temp.m_data[k][i] != 0) {
-                DenseMatrix::value_type factor = temp.m_data[k][i];
+            if (k != i && temp[k][i] != 0) {
+                DenseMatrix::value_type factor = temp[k][i];
                 for (size_t j = 0; j < n; ++j) {
-                    temp.m_data[k][j] -= factor * temp.m_data[i][j];
-                    inverse.m_data[k][j] -= factor * inverse.m_data[i][j];
+                    temp[k][j] -= factor * temp[i][j];
+                    inverse[k][j] -= factor * inverse[i][j];
                 }
             }
         }

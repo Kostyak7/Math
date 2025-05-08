@@ -48,7 +48,6 @@ namespace math::linal {
         size_t get_height() const override;
 
         void shrink();
-        void clear() override;
 
         value_type det() const override;
 
@@ -58,9 +57,7 @@ namespace math::linal {
         void swap(SparseMatrix& other) noexcept;
 
         static SparseMatrix identity_matrix(size_t n);
-
-        const std::unordered_map<std::pair<size_t, size_t>, value_type>& data() const;
-        std::unordered_map<std::pair<size_t, size_t>, value_type> data();
+        static SparseMatrix elementary_matrix_unit(size_t n, size_t m, size_t i, size_t j);
 
     private:
         size_t m_width = 0;

@@ -15,6 +15,7 @@ namespace math::linal {
         virtual ~IMatrix() = default;
 
         virtual bool is_equal(const IMatrix& other) const;
+        virtual bool is_empty() const;
 
         virtual bool is_square() const;
         virtual bool is_zero() const;
@@ -27,14 +28,11 @@ namespace math::linal {
         virtual bool is_positive_definite() const;
         virtual bool is_negative_definite() const;
 
-        virtual value_type get(size_t row, size_t col) const = 0;
-        virtual void set(size_t row, size_t col, value_type value) = 0;
-
-        virtual bool is_empty() const;
-        virtual void clear() = 0;
-
         virtual size_t get_width() const = 0;
         virtual size_t get_height() const = 0;
+
+        virtual value_type get(size_t row, size_t col) const = 0;
+        virtual void set(size_t row, size_t col, value_type value) = 0;
 
         virtual value_type det() const = 0;
 

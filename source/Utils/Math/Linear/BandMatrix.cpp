@@ -4,45 +4,9 @@
 
 #include <stdexcept>
 
-math::linal::BandMatrix::BandMatrix(size_t n, const FVector& default_value) 
-    : m_data(n, default_value)
-{
-}
-
-math::linal::BandMatrix::BandMatrix(const BandMatrix& matrix) 
-    : m_data(matrix.m_data)
-{
-}
-
-math::linal::BandMatrix::BandMatrix(BandMatrix&& matrix) noexcept {
-    swap(std::move(matrix));
-}
-
-math::linal::BandMatrix::BandMatrix(std::initializer_list<std::initializer_list<value_type>> list) {
-    for (const auto& r : list) {
-        FVector row;
-        row.insert(row.end(), r.begin(), r.end());
-        m_data.emplace_back(std::move(row));
-    }
-}
-
-math::linal::BandMatrix& math::linal::BandMatrix::operator=(const BandMatrix& other) {
-    if (this == &other)
-        return *this;
-    m_data = other.m_data;
-    return *this;
-}
-
-math::linal::BandMatrix& math::linal::BandMatrix::operator=(BandMatrix&& other) {
-    if (this == &other)
-        return *this;
-    swap(other);
-    return *this;
-
-}
 
 math::linal::BandMatrix& math::linal::BandMatrix::operator*=(value_type scalar) noexcept {
-    for (auto& vec : m_data) {
+    for (auto& vec : *this) {
         vec *= scalar;
     }
     return *this;
@@ -63,7 +27,7 @@ math::linal::BandMatrix& math::linal::BandMatrix::operator+=(const BandMatrix& o
     const size_t isl = get_isl();
     for (size_t i = 0; i < get_height(); ++i) {
         for (size_t j = 0; j < isl; ++j) {
-            m_data[i][j] += other.m_data[i][j];
+            (*this)[i][j] += other[i][j];
         }
     }
 
@@ -81,14 +45,14 @@ math::linal::BandMatrix& math::linal::BandMatrix::operator-=(const BandMatrix& o
     const size_t isl = get_isl();
     for (size_t i = 0; i < get_height(); ++i) {
         for (size_t j = 0; j < isl; ++j) {
-            m_data[i][j] -= other.m_data[i][j];
+            (*this)[i][j] -= other[i][j];
         }
     }
     return *this;
 }
 
 bool math::linal::BandMatrix::is_zero() const {
-    for (const auto& vec : m_data) {
+    for (const auto& vec : *this) {
         if (!vec.is_zero()) {
             return false;
         }
@@ -99,7 +63,7 @@ bool math::linal::BandMatrix::is_zero() const {
 bool math::linal::BandMatrix::is_identity() const {
     if (!is_square())
         return false;
-    for (const auto& row : m_data) {
+    for (const auto& row : *this) {
         if (dcmp(row.at(0), 1.) != 0) return false;
         for (size_t i = 1; i < row.size(); ++i) {
             if (dcmp(row.at(i)) != 0)
@@ -112,7 +76,7 @@ bool math::linal::BandMatrix::is_identity() const {
 bool math::linal::BandMatrix::is_diagonal() const {
     if (!is_square())
         return false;
-    for (const auto& row : m_data) {
+    for (const auto& row : *this) {
         if (dcmp(row.at(0)) == 0) 
             return false;
         for (size_t i = 1; row.size(); ++i) {
@@ -147,9 +111,9 @@ math::linal::BandMatrix::value_type math::linal::BandMatrix::get(size_t row, siz
         return 0.0;
     }
     if (col < row) {
-        return m_data[col][row - col];
+        return (*this)[col][row - col];
     }
-    return m_data[row][col - row];
+    return (*this)[row][col - row];
 }
 
 void math::linal::BandMatrix::set(size_t row, size_t col, value_type value) {
@@ -163,34 +127,29 @@ void math::linal::BandMatrix::set(size_t row, size_t col, value_type value) {
         set_isl(row - col + 1);
     }
     if (col < row) {
-        m_data[col][row] = value;
+        (*this)[col][row] = value;
     }
-    m_data[row][col] = value;
-}
-
-const math::linal::FVector& math::linal::BandMatrix::operator[](size_t row) const {
-    return m_data[row];
-}
-
-math::linal::FVector& math::linal::BandMatrix::operator[](size_t row) {
-    return m_data[row];
+    (*this)[row][col] = value;
 }
 
 size_t math::linal::BandMatrix::get_width() const {
-    return m_data.size();
+    return size();
 }
 
 size_t math::linal::BandMatrix::get_height() const {
-    return m_data.size();
+    return size();
 }
 
 size_t math::linal::BandMatrix::get_isl() const {
-    return m_data.at(0).size();
+    if (empty()) {
+        return 0;
+    }
+    return at(0).size();
 }
 
 void math::linal::BandMatrix::set_isl(size_t width) {
     if (width == get_isl() || width == 0) return;
-    for (auto& vec : m_data) {
+    for (auto& vec : (*this)) {
         vec.resize(width);
     }
 }
@@ -210,13 +169,9 @@ void math::linal::BandMatrix::shrink() {
             return;
         new_isl = std::max(new_isl, old_isl - zero_count);
     }
-    for (auto& vec : m_data) {
+    for (auto& vec : *this) {
         vec.resize(new_isl);
     }
-}
-
-void math::linal::BandMatrix::clear() {
-    m_data.clear();
 }
 
 math::linal::BandMatrix::value_type math::linal::BandMatrix::det() const {
@@ -243,26 +198,16 @@ std::vector<std::pair<math::linal::BandMatrix::complex_value_type, std::vector<m
 
 math::linal::BandMatrix math::linal::BandMatrix::identity_matrix(size_t n, size_t isl) {
     BandMatrix res(n, FVector(isl, 0.0));
-    for (auto& row : res.m_data) {
+    for (auto& row : res) {
         row[0] = 1.0;
     }
     return res;
 }
 
-const std::vector<math::linal::FVector>& math::linal::BandMatrix::data() const {
-    return m_data;
-}
-
-std::vector<math::linal::FVector>& math::linal::BandMatrix::data() {
-    return m_data;
-}
-
-void math::linal::BandMatrix::swap(BandMatrix& other) noexcept {
-    std::swap(m_data, other.m_data);
-}
-
-void math::linal::swap(BandMatrix& m1, BandMatrix& m2) noexcept {
-    m1.swap(m2);
+math::linal::BandMatrix math::linal::BandMatrix::elementary_matrix_unit(size_t n, size_t i, size_t j) {
+    BandMatrix res(n);
+    res.set(i, j, 1.0);
+    return res;
 }
 
 bool math::linal::operator==(const BandMatrix& m1, const BandMatrix& m2) {

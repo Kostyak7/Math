@@ -1,44 +1,68 @@
-Solver: CG+JACOBI
+Solver: GMRES+MG
 time: 
-907.154, 	
+1814.34, 	
 
 Solver: BiCGSTAB
 time: 
-881.064, 	
+875.224, 	
+
+Solver: Gauss
+time: 
+9.23, 	
 
 Solver: MINRES
 time: 
-952.664, 	
+234.934, 	
 
 Solver: CG
 time: 
-239.698, 	
-
-Solver: BiCGSTAB+JACOBI
-time: 
-1233.36, 	
+244.244, 	
 
 Solver: FGMRES
 time: 
-1088.52, 	
+298.993, 	
 
 Solver: GMRES
 time: 
-1088.1, 	
+1822.25, 	
 
 Solver: FGMRES+JACOBI
 time: 
-1084.98, 	
+297.123, 	
+
+Solver: CG+MG
+time: 
+240.984, 	
 
 Solver: GMRES+JACOBI
 time: 
-1092.37, 	
+2133.47, 	
 
-Solver: MINRES+JACOBI
+Solver: BiCGSTAB+ILU
 time: 
-941.317, 	
+20.602, 	
+
+Solver: CG+ILU
+time: 
+20.553, 	
+
+Solver: FGMRES+ILU
+time: 
+27.712, 	
+
+Solver: GMRES+ILU
+time: 
+42.985, 	
 
 Solver: BiCGSTAB+MG
 time: 
-844.772, 	
+849.242, 	
+
+Solver: FGMRES+MG
+time: 
+298.468, 	
+
+Solver: MINRES+MG
+time: 
+236.285, 	
 

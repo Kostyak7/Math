@@ -60,7 +60,7 @@ namespace math::geom {
     public:
         using value_type = Point4D::value_type;
 
-        value_type x, y;
+        value_type x, y, z, w;
 
         Vector4D(value_type x = 0.0, value_type y = 0.0, value_type z = 0.0, value_type w = 0.0);
         Vector4D(const Point4D& to);

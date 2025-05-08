@@ -11,5 +11,5 @@ size_t math::linal::IKrylovTypeLinearSystemSolver::get_Krylov_subspace_dimension
 }
 
 size_t math::linal::IKrylovTypeLinearSystemSolver::get_Krylov_subspace_dimension(size_t system_size) const {
-    return std::min(m_Krylov_subspace_dimension, system_size);
+    return std::max(m_Krylov_subspace_dimension, get_max_iteration_count(system_size));
 }

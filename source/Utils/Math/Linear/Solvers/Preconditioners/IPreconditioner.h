@@ -11,7 +11,7 @@ namespace math::linal {
         virtual ~IPreconditioner() = default;
         virtual void init(const AnyMatrix& matrix) = 0;
 
-        FVector apply(const FVector& x) const {
+        FVector apply(const FVector& x) const { // по дефолту это только левое предобуславливание
             return m_impl->apply(x);
         }
 

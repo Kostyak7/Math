@@ -19,6 +19,10 @@ bool math::linal::IMatrix::is_equal(const IMatrix& other) const {
 	return true;
 }
 
+bool math::linal::IMatrix::is_empty() const {
+	return get_height() == 0 || get_width() == 0;
+}
+
 bool math::linal::IMatrix::is_square() const {
 	return get_width() == get_height();
 }
@@ -116,10 +120,6 @@ bool math::linal::IMatrix::is_negative_definite() const {
 	auto eigenvalues = get_eigenvalues();
 	return std::all_of(eigenvalues.begin(), eigenvalues.end(),
 		[](const auto& pair) { return pair.second.real() < 0; });
-}
-
-bool math::linal::IMatrix::is_empty() const {
-	return get_height() == 0 || get_width() == 0;
 }
 
 bool math::linal::is_positive_definite_stochastic(const IMatrix& matrix, size_t test_points) {

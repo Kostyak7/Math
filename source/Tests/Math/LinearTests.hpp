@@ -227,8 +227,8 @@ namespace tests {
 			}
 			SLAE<math::linal::BandMatrix> slae;
 			for (int i = 0; i < n; ++i) {
-				slae.A.data().resize(n);
-				for (auto& row : slae.A.data()) {
+				slae.A.resize(n);
+				for (auto& row : slae.A) {
 					row = get_random_vector(isl, sparsity);
 				}
 			}
@@ -252,8 +252,8 @@ namespace tests {
 		SLAE<math::linal::DenseMatrix> get_SLAE(size_t n, double sparsity = 0.5) {
 			SLAE<math::linal::DenseMatrix> slae;
 			for (int i = 0; i < n; ++i) {
-				slae.A.data().resize(n);
-				for (auto& row : slae.A.data()) {
+				slae.A.resize(n);
+				for (auto& row : slae.A) {
 					row = get_random_vector(n, sparsity);
 				}
 			}

@@ -29,7 +29,7 @@ namespace {
             for (size_t i = 0; i < n; ++i) {
                 const double diag = matrix[i][0];
 
-                if (::math::dcmp(diag) == 0) {
+                if (math::dcmp(diag) == 0) {
                     throw std::runtime_error("Zero diagonal element found in matrix for Jacobi preconditioner");
                 }
 

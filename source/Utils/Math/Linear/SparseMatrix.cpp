@@ -201,10 +201,6 @@ void math::linal::SparseMatrix::shrink() {
     }
 }
 
-void math::linal::SparseMatrix::clear() {
-    m_data.clear();
-}
-
 math::linal::SparseMatrix::value_type math::linal::SparseMatrix::det() const {
     value_type determinant = 1.0;
     if (is_empty())
@@ -235,12 +231,10 @@ math::linal::SparseMatrix math::linal::SparseMatrix::identity_matrix(size_t n) {
     return res;
 }
 
-const std::unordered_map<std::pair<size_t, size_t>, math::linal::SparseMatrix::value_type>& math::linal::SparseMatrix::data() const {
-    return m_data;
-}
-
-std::unordered_map<std::pair<size_t, size_t>, math::linal::SparseMatrix::value_type> math::linal::SparseMatrix::data() {
-    return m_data;
+math::linal::SparseMatrix math::linal::SparseMatrix::elementary_matrix_unit(size_t n, size_t m, size_t i, size_t j) {
+    SparseMatrix res(n, m);
+    res.set(i, j, 1.0);
+    return res;
 }
 
 void math::linal::SparseMatrix::swap(SparseMatrix& other) noexcept {
