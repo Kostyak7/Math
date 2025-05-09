@@ -4,10 +4,6 @@
 
 namespace math::linal {
 
-    /**
-     @brief Решение системы методом гаусса с обходом нулей.
-     @details Решает систему уравнений следующего вида matrix*solution=rhs (для матрицы ленточного вида).
-    */
     class GaussLinearSystemSolver final : public ILinearSystemSolver {
     public:
         GaussLinearSystemSolver(const Params& params = {});

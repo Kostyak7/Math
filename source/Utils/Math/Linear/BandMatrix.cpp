@@ -283,8 +283,8 @@ math::linal::BandMatrix math::linal::operator*(const BandMatrix& m1, const BandM
     }
 
     size_t n = m1.get_height();
-    size_t w = m1.get_isl();  // ширина ленты
-    BandMatrix result(n, FVector(w + 1, 0.0)); // новая ленточная матрица
+    size_t w = m1.get_isl();  
+    BandMatrix result(n, FVector(w + 1, 0.0)); 
 
     for (size_t i = 0; i < n; ++i) {
         for (size_t j = std::max(0, (int)i - (int)w); j <= std::min(n - 1, i + w); ++j) {
@@ -327,7 +327,6 @@ math::linal::BandMatrix math::linal::inversed(const BandMatrix& matrix) {
         throw std::invalid_argument("Matrix is empty");
     }
 
-    // Далее реализовано нахождение разложения Холецкого
     size_t n = matrix.get_height();
     BandMatrix L(n, FVector(n, 0.0));
     // ...

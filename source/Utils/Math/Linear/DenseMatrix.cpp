@@ -294,7 +294,6 @@ math::linal::DenseMatrix math::linal::inversed(const DenseMatrix& matrix) {
             inverse[i][j] /= diag;
         }
 
-        // Исключение элементов в столбце
         for (size_t k = 0; k < n; ++k) {
             if (k != i && temp[k][i] != 0) {
                 DenseMatrix::value_type factor = temp[k][i];
