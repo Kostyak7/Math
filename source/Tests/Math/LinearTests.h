@@ -222,7 +222,7 @@ namespace tests {
 		SolverTester<TMatrix>::Params params = { true, true, true, false, false, false };
 
 		std::vector<std::shared_ptr<SolverTester<TMatrix>>> testers{
-			//create_solver_tester(slaes, SolverFactory::SolverName::Gauss,    SolverFactory::PredictionerName::None, params), // +
+			create_solver_tester(slaes, SolverFactory::SolverName::Gauss,    SolverFactory::PredictionerName::None, params), // +
 			//create_solver_tester(slaes, SolverFactory::SolverName::BiCGSTAB, SolverFactory::PredictionerName::None, params), // +
 			//create_solver_tester(slaes, SolverFactory::SolverName::CG,       SolverFactory::PredictionerName::None, params), // +
 			//create_solver_tester(slaes, SolverFactory::SolverName::FGMRES,   SolverFactory::PredictionerName::None, params), // +

@@ -5,9 +5,9 @@ int main() {
 
     //tests::base_tests<math::linal::BandMatrix>();
 
-    //tests::one_random_test<math::linal::BandMatrix>();
+    tests::one_random_test<math::linal::BandMatrix>();
 
-    tests::diff_sizes_test<math::linal::BandMatrix>();
+    //tests::diff_sizes_test<math::linal::BandMatrix>();
     
     //tests::diff_isl_test();
 
