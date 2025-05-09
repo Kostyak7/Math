@@ -11,6 +11,9 @@ namespace math::linal {
                                  const Params& params = {}, 
                                  std::unique_ptr<IPreconditioner> preconditioner = nullptr);
         FVector solve(const AnyMatrix& matrix, const FVector& rhs, const FVector& x0 = {}) override;
+
+    private:
+        bool slae_check(const AnyMatrix& matrix, const FVector& rhs) const override;
     };
 
 } // namespace math::linal    

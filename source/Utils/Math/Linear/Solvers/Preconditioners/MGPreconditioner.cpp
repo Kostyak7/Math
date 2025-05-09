@@ -192,14 +192,12 @@ namespace {
 
         Matrix create_coarse_matrix(const Matrix& fine) {
             // Здесь должна быть реализация создания грубой матрицы
-            // Например, используя геометрическую или алгебраическую многосеточную методику
-            // В упрощенном виде можно просто взять каждую вторую точку
+            // В упрощенном виде (нынешнем) просто береться каждая вторая точкп
 
             size_t n = fine.get_width();
             size_t coarse_n = (n + 1) / 2;
             Matrix coarse(coarse_n);
 
-            // Новая ширина ленты на грубом уровне (можно уменьшить, но не меньше 1)
             size_t coarse_isl = std::max<size_t>(1, fine.get_isl() / 2);
             coarse.set_isl(coarse_isl);
 
@@ -207,17 +205,14 @@ namespace {
                 size_t fine_i = 2 * i;
                 if (fine_i >= n) break;
 
-                // Обрабатываем только элементы в пределах новой ленты coarse[i]
                 for (size_t j = i; j < std::min(i + coarse_isl, coarse_n); ++j) {
                     size_t fine_j = 2 * j;
                     if (fine_j >= n) break;
 
-                    // Проверяем, что fine_j - fine_i в пределах ленты fine_i
                     size_t band_offset = fine_j - fine_i;
                     if (band_offset < fine[fine_i].size()) {
                         coarse[i][j - i] = fine[fine_i][band_offset];
                     }
-                    // Иначе оставляем 0 (вне ленты)
                 }
             }
 
@@ -273,21 +268,19 @@ namespace {
 
         void jacobi_smooth(const Matrix& A, const Vector& rhs, Vector& x) const {
             Vector new_x = x;
-            size_t isl = A.get_isl();  // Полуширина ленты
+            size_t isl = A.get_isl();  
             size_t n = A.get_width();
 
             for (size_t i = 0; i < n; ++i) {
                 double sum = 0.0;
-                double diag = A[i][0];  // Диагональный элемент
+                double diag = A[i][0];  
 
-                // Элементы над диагональю (хранятся в BandMatrix)
                 for (size_t j = 1; j <= isl && i + j < n; ++j) {
                     sum += A[i][j] * x[i + j];
                 }
 
-                // Элементы под диагональю (используем симметрию)
                 for (size_t j = 1; j <= isl && i >= j; ++j) {
-                    sum += A[i - j][j] * x[i - j];  // A[i-j][j] == A[i][j] (симметрия)
+                    sum += A[i - j][j] * x[i - j];  
                 }
 
                 new_x[i] = (rhs[i] - sum) / diag;
@@ -298,22 +291,22 @@ namespace {
 
         void gauss_seidel_smooth(const Matrix& A, const Vector& rhs, Vector& x) const {
             const size_t isl = A.get_isl();
-            for (size_t i = 0; i < A.get_height(); ++i) {
+            const size_t height = A.get_height();
+            const size_t width = A.get_width();
+            for (size_t i = 0; i < height; ++i) {
                 double sum = 0.0;
-                double diag = A[i][0]; // диагональный элемент
+                double diag = A[i][0]; 
 
-                // Учитываем только элементы над диагональю (уже обновленные)
                 for (size_t j = 1; j < isl; ++j) {
                     size_t col = i + j;
-                    if (col < A.get_width()) {
+                    if (col < width) {
                         sum += A[i][j] * x[col];
                     }
                 }
 
-                // Симметричная часть (нижний треугольник не хранится)
                 for (size_t j = 1; j < isl; ++j) {
                     size_t row = i - j;
-                    if (row < A.get_height()) {
+                    if (row < height) {
                         sum += A[row][j] * x[row];
                     }
                 }
@@ -323,10 +316,8 @@ namespace {
         }
 
         void ilu0_smooth(const Matrix& A, const Vector& rhs, Vector& x, size_t level_idx) const {
-            // Упрощенная реализация ILU(0) сглаживания
-            // В реальной реализации нужно предварительно вычислить ILU разложение
+            // TODO
 
-            // Здесь просто используем GS сглаживание как пример
             gauss_seidel_smooth(A, rhs, x);
         }
 

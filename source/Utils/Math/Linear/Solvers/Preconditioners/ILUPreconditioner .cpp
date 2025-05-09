@@ -30,31 +30,28 @@ namespace {
             U.resize(n);
 
             for (size_t i = 0; i < n; ++i) {
-                // Копируем строку исходной матрицы в U (только в пределах ленты)
+                // U 
                 size_t u_size = std::min(isl, n - i);
                 U[i].resize(u_size);
                 for (size_t j = 0; j < u_size; ++j) {
                     U[i][j] = matrix[i][j];
                 }
 
-                // Инициализируем L (только элементы в пределах ленты под диагональю)
+                // L 
                 size_t l_size = i < isl ? i : isl;
                 L[i].resize(l_size, 0.0);
                 if (i > 0 && L[i].size() > 0) {
-                    L[i][L[i].size() - 1] = 1.0; // Ближайший к диагонали элемент
+                    L[i][L[i].size() - 1] = 1.0; 
                 }
             }
 
-            // Неполное LU-разложение с учетом ленты
+            // ILU-разложение 
             for (size_t k = 0; k < n; ++k) {
-                // Обрабатываем диагональный элемент U[k][0]
                 double& u_kk = U[k][0];
                 double sum = 0.0;
 
-                // Вычисляем сумму только для элементов в пределах ленты
                 size_t start_m = k > isl ? k - isl : 0;
                 for (size_t m = start_m; m < k; ++m) {
-                    // Получаем L[k][m] и U[m][k-m]
                     size_t l_pos = m - (k - L[k].size());
                     size_t u_pos = k - m;
 
@@ -64,10 +61,10 @@ namespace {
                 }
                 u_kk -= sum;
 
-                // Стабилизация диагонали
-                if (u_kk == 0.0) u_kk = 1e-12;
+                if (math::dcmp(u_kk) == 0) 
+                    u_kk = math::TOLERANCE;
 
-                // Обновляем элементы U в строке k (в пределах ленты)
+                // Обновляем элементы U в строке k
                 size_t max_j = std::min(k + isl, n);
                 for (size_t j = k + 1; j < max_j; ++j) {
                     double& u_kj = U[k][j - k];
@@ -85,10 +82,9 @@ namespace {
                     u_kj -= sum;
                 }
 
-                // Обновляем элементы L в столбце k (в пределах ленты)
+                // Обновляем элементы L в столбце k
                 size_t max_i = std::min(k + isl, n);
                 for (size_t i = k + 1; i < max_i; ++i) {
-                    // Находим позицию L[i][k] в векторе
                     size_t l_pos = k - (i - L[i].size());
                     if (l_pos >= L[i].size()) continue;
 
@@ -118,7 +114,7 @@ namespace {
             Vector y(n);
             Vector z(n);
 
-            // Прямая подстановка Ly = x (с учетом ленты L)
+            // Ly = x 
             for (size_t i = 0; i < n; ++i) {
                 double sum = 0.0;
                 size_t start_j = i > isl ? i - isl : 0;
@@ -131,7 +127,7 @@ namespace {
                 y[i] = x[i] - sum;
             }
 
-            // Обратная подстановка Uz = y (с учетом ленты U)
+            // Uz = y 
             for (int i = n - 1; i >= 0; --i) {
                 double sum = 0.0;
                 size_t end_j = std::min(i + isl, n);

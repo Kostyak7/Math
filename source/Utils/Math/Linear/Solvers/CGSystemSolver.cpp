@@ -7,6 +7,20 @@ math::linal::CGLinearSystemSolver::CGLinearSystemSolver(size_t Krylov_subspace_d
 {
 }
 
+bool math::linal::CGLinearSystemSolver::slae_check(const AnyMatrix& matrix, const FVector& rhs) const {
+    return std::visit([this, &rhs](const auto& matrix) -> bool {
+        if (IKrylovTypeLinearSystemSolver::slae_check(matrix, rhs)) {
+            return true;
+        }
+        if (matrix.is_symmetrical()) {
+            if (m_params.throw_exceptions)
+                throw std::invalid_argument("Matrix of system must be symmetrical");
+            return false;
+        }
+        return true;
+        }, matrix);
+}
+
 math::linal::FVector math::linal::CGLinearSystemSolver::solve(const AnyMatrix& matrix, const FVector& rhs, const FVector& x0) {
     return std::visit([this, &rhs, &x0](const auto& matrix) -> FVector {
         auto [need_to_solve, x, rhs_norm, r, beta, resid] = init_method(matrix, rhs, x0);
