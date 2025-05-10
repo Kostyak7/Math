@@ -9,7 +9,7 @@ math::linal::ILinearSystemSolver::Params math::linal::ILinearSystemSolver::get_p
 	return m_params;
 }
 
-bool math::linal::ILinearSystemSolver::slae_check(const AnyMatrix& matrix, const FVector& rhs) const {
+bool math::linal::ILinearSystemSolver::slae_check(const AnyMatrix& matrix, const DVector& rhs) const {
 	return std::visit([this, &rhs](const auto& matrix) -> bool {
 		if (matrix.is_empty()) {
 			if (m_params.throw_exceptions)

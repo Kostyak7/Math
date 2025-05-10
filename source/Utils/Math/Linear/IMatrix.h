@@ -1,6 +1,6 @@
 #pragma once 
 
-#include "FVector.h"
+#include "DVector.h"
 
 #include <complex>
 
@@ -37,7 +37,7 @@ namespace math::linal {
         virtual value_type det() const = 0;
 
         virtual std::vector<std::pair<size_t, complex_value_type>> get_eigenvalues() const = 0;
-        virtual std::vector<std::pair<complex_value_type, std::vector<FVector>>> get_eigenvectors() const = 0;
+        virtual std::vector<std::pair<complex_value_type, std::vector<DVector>>> get_eigenvectors() const = 0;
     };
 
     bool is_positive_definite_stochastic(const IMatrix& matrix, size_t test_points = 1000);

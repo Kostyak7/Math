@@ -18,4 +18,4 @@ namespace math::geom {
         bool contains(const Vector3D& vec) const;
     };
 
-}
+} // namespace math::geom

@@ -37,19 +37,19 @@ namespace math::linal {
     protected:
         struct Data {
             bool need_to_solve;
-            FVector x;
+            DVector x;
             double rhs_norm;
-            FVector r;
+            DVector r;
             double r_norm;
             double resid;
         };
 
-        virtual Data init_method(const AnyMatrix& matrix, const FVector& rhs, const FVector& x0);
+        virtual Data init_method(const AnyMatrix& matrix, const DVector& rhs, const DVector& x0);
 
         void init_preconditioner(const AnyMatrix& matrix) const;
-        FVector apply_precondition(const FVector& vector) const;
+        DVector apply_precondition(const DVector& vector) const;
 
-        bool check_convergence_criterion(const FVector& residual, double rhs_norm, size_t iteration) const;
+        bool check_convergence_criterion(const DVector& residual, double rhs_norm, size_t iteration) const;
 
         size_t get_max_iteration_count(size_t system_size) const;
         void collect_solution_stats(const SolutionStats& stats);

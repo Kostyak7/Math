@@ -1,24 +1,24 @@
-#include "FVector.h"
+#include "DVector.h"
 
 #include <Utils/Math/Common.h>
 
 #include <stdexcept>
 
-math::linal::FVector& math::linal::FVector::operator*=(value_type scalar) {
+math::linal::DVector& math::linal::DVector::operator*=(value_type scalar) {
     for (auto& val : *this) {
         val *= scalar;
     }
     return *this;
 }
 
-math::linal::FVector& math::linal::FVector::operator/=(value_type scalar) {
+math::linal::DVector& math::linal::DVector::operator/=(value_type scalar) {
     if (dcmp(scalar) == 0) {
         throw std::invalid_argument("Impossible to divide by zero");
     }
     return *this *= (1.0 / scalar);
 }
 
-math::linal::FVector& math::linal::FVector::operator+=(const FVector& other) {
+math::linal::DVector& math::linal::DVector::operator+=(const DVector& other) {
     if (size() != other.size()) {
         throw std::invalid_argument("Vectors must have the same size");
     }
@@ -28,7 +28,7 @@ math::linal::FVector& math::linal::FVector::operator+=(const FVector& other) {
     return *this;
 }
 
-math::linal::FVector& math::linal::FVector::operator-=(const FVector& other) {
+math::linal::DVector& math::linal::DVector::operator-=(const DVector& other) {
     if (size() != other.size()) {
         throw std::invalid_argument("Vectors must have the same size");
     }
@@ -38,7 +38,7 @@ math::linal::FVector& math::linal::FVector::operator-=(const FVector& other) {
     return *this;
 }
 
-bool math::linal::FVector::is_zero() const {
+bool math::linal::DVector::is_zero() const {
     for (const auto& val : *this) {
         if (dcmp(val) != 0) {
             return false;
@@ -47,7 +47,7 @@ bool math::linal::FVector::is_zero() const {
     return true;
 }
 
-math::linal::FVector::value_type math::linal::FVector::dot(const FVector& other) const {
+math::linal::DVector::value_type math::linal::DVector::dot(const DVector& other) const {
     if (size() != other.size()) {
         throw std::invalid_argument("Vectors must have the same size");
     }
@@ -58,11 +58,15 @@ math::linal::FVector::value_type math::linal::FVector::dot(const FVector& other)
     return result;
 }
 
-math::linal::FVector::value_type math::linal::FVector::norm() const {
+math::linal::DVector::value_type math::linal::DVector::norm() const {
     return std::sqrt(dot(*this));
 }
 
-math::linal::FVector& math::linal::FVector::normalize() {
+math::linal::DVector::value_type math::linal::DVector::length() const {
+    return norm();
+}
+
+math::linal::DVector& math::linal::DVector::normalize() {
     value_type norm = this->norm();
     if (dcmp(norm) == 0) {
         throw std::runtime_error("Cannot normalize zero vector");
@@ -70,7 +74,7 @@ math::linal::FVector& math::linal::FVector::normalize() {
     return *this /= norm;
 }
 
-bool math::linal::operator==(const FVector& v1, const FVector& v2) {
+bool math::linal::operator==(const DVector& v1, const DVector& v2) {
     if (v1.size() != v2.size()) 
         return false;
     for (size_t i = 0; i < v1.size(); ++i) {
@@ -80,44 +84,46 @@ bool math::linal::operator==(const FVector& v1, const FVector& v2) {
     return true;
 }
 
-bool math::linal::operator!=(const FVector& v1, const FVector& v2) {
+bool math::linal::operator!=(const DVector& v1, const DVector& v2) {
     return !(v1 == v2);
 }
 
-math::linal::FVector math::linal::operator*(FVector vector, FVector::value_type scalar) {
-    return vector *= scalar;
+math::linal::DVector math::linal::operator*(const DVector& vector, DVector::value_type scalar) {
+    DVector res(vector);
+    res *= scalar;
+    return scalar;
 }
 
-math::linal::FVector math::linal::operator*(FVector::value_type scalar, FVector vector) {
-    return vector *= scalar;
+math::linal::DVector math::linal::operator*(DVector::value_type scalar, const DVector& vector) {
+    return vector * scalar;
 }
 
-math::linal::FVector math::linal::operator/(FVector vector, FVector::value_type scalar) {
-    return vector /= scalar;
+math::linal::DVector math::linal::operator/(const DVector& vector, DVector::value_type scalar) {
+    return vector * (1. / scalar);
 }
 
-math::linal::FVector math::linal::operator+(const FVector& v1, const FVector& v2) {
+math::linal::DVector math::linal::operator+(const DVector& v1, const DVector& v2) {
     if (v1.size() != v2.size()) {
         throw std::invalid_argument("Vectors must have the same size");
     }
-    FVector result(v1);
+    DVector result(v1);
     return result += v2;
 }
 
-math::linal::FVector math::linal::operator-(const FVector& v1, const FVector& v2) {
+math::linal::DVector math::linal::operator-(const DVector& v1, const DVector& v2) {
     if (v1.size() != v2.size()) {
         throw std::invalid_argument("Vectors must have the same size");
     }
-    FVector result(v1);
+    DVector result(v1);
     return result -= v2;
 }
 
-math::linal::FVector math::linal::operator-(const FVector& vector) {
+math::linal::DVector math::linal::operator-(const DVector& vector) {
     return -1 * vector;
 }
 
-math::linal::FVector math::linal::normalized(FVector vector) {
-    FVector::value_type norm = 0.0;
+math::linal::DVector math::linal::normalized(DVector vector) {
+    DVector::value_type norm = 0.0;
     for (const auto& val : vector) {
         norm += val * val;
     }

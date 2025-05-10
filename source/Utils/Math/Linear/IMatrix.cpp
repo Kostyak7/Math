@@ -133,7 +133,7 @@ bool math::linal::is_positive_definite_stochastic(const IMatrix& matrix, size_t 
 	std::normal_distribution<value_type> dist(0, 1);
 
 	const size_t n = matrix.get_width();
-	FVector x(n);
+	DVector x(n);
 
 	for (size_t test = 0; test < test_points; ++test) {
 		for (size_t i = 0; i < n; ++i) {
@@ -163,7 +163,7 @@ bool math::linal::is_negative_definite_stochastic(const IMatrix& matrix, size_t 
 	std::normal_distribution<value_type> dist(0, 1);
 
 	const size_t n = matrix.get_width();
-	FVector x(n);
+	DVector x(n);
 
 	for (size_t test = 0; test < test_points; ++test) {
 		for (size_t i = 0; i < n; ++i) {

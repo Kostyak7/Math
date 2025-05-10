@@ -6,11 +6,9 @@
 #include <stdexcept>
 
 math::geom::Plane::Plane(const Point3D& p1, const Point3D& p2, const Point3D& p3) {
-    // ¬ычисл€ем два вектора в плоскости
     Vector3D v1(p1, p2);
     Vector3D v2(p1, p3);
 
-    // Ќаходим нормаль к плоскости через векторное произведение
     Vector3D normal = v1.cross(v2);
 
     value_type length = normal.length();
@@ -25,7 +23,7 @@ math::geom::Plane::Plane(const Point3D& p1, const Point3D& p2, const Point3D& p3
 }
 
 math::geom::Vector3D math::geom::Plane::normal_vector() const {
-    return Vector3D(a, b, c);
+    return Vector3D{ a, b, c };
 }
 
 math::geom::Plane::value_type math::geom::Plane::distance_to(const Point3D& point) const {

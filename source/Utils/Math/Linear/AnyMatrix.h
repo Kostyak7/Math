@@ -14,8 +14,8 @@ namespace math::linal {
     AnyMatrix operator*(IMatrix::value_type scalar, const AnyMatrix& matrix);
     AnyMatrix operator/(const AnyMatrix& matrix, IMatrix::value_type scalar);
 
-    FVector operator*(const AnyMatrix& matrix, const FVector& vector);
-    FVector operator*(const FVector& vector, const AnyMatrix& matrix);
+    DVector operator*(const AnyMatrix& matrix, const DVector& vector);
+    DVector operator*(const DVector& vector, const AnyMatrix& matrix);
 
     AnyMatrix operator*(const AnyMatrix& m1, const AnyMatrix& m2);
 

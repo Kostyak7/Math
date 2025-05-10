@@ -17,8 +17,8 @@ math::linal::AnyMatrix math::linal::operator/(const AnyMatrix& matrix, IMatrix::
 	return matrix * (1 / scalar);
 }
 
-math::linal::FVector math::linal::operator*(const AnyMatrix& matrix, const FVector& vector) {
-	return std::visit([&vector](const auto& matrix) -> FVector {
+math::linal::DVector math::linal::operator*(const AnyMatrix& matrix, const DVector& vector) {
+	return std::visit([&vector](const auto& matrix) -> DVector {
 		if (matrix.get_width() != vector.size())
 			throw std::invalid_argument("The matrix and the vector must be the same size");
 
@@ -26,8 +26,8 @@ math::linal::FVector math::linal::operator*(const AnyMatrix& matrix, const FVect
 		}, matrix);
 }
 
-math::linal::FVector math::linal::operator*(const FVector& vector, const AnyMatrix& matrix) {
-	return std::visit([&vector](const auto& matrix) -> FVector {
+math::linal::DVector math::linal::operator*(const DVector& vector, const AnyMatrix& matrix) {
+	return std::visit([&vector](const auto& matrix) -> DVector {
 		if (matrix.get_height() != vector.size())
 			throw std::invalid_argument("The matrix and the vector must be the same size");
 

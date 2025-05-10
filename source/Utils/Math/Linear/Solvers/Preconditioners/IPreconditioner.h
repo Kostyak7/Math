@@ -11,14 +11,14 @@ namespace math::linal {
         virtual ~IPreconditioner() = default;
         virtual void init(const AnyMatrix& matrix) = 0;
 
-        FVector apply(const FVector& x) const { // ïî äåôîëòó ýòî òîëüêî ëåâîå ïðåäîáóñëàâëèâàíèå
+        DVector apply(const DVector& x) const { // Ð¿Ð¾ Ð´ÐµÑ„Ð¾Ð»Ñ‚Ñƒ ÑÑ‚Ð¾ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð»ÐµÐ²Ð¾Ðµ Ð¿Ñ€ÐµÐ´Ð¾Ð±ÑƒÑÐ»Ð°Ð²Ð»Ð¸Ð²Ð°Ð½Ð¸Ðµ
             return m_impl->apply(x);
         }
 
         class IImpl {
         public:
             virtual ~IImpl() = default;
-            virtual FVector apply(const FVector& x) const = 0;
+            virtual DVector apply(const DVector& x) const = 0;
         };
 
     protected:

@@ -5,17 +5,17 @@
 namespace math::linal {
 
     /**
-     @brief Обычная плотная матрица 
+     @brief РћР±С‹С‡РЅР°СЏ РїР»РѕС‚РЅР°СЏ РјР°С‚СЂРёС†Р° 
     */
     class DenseMatrix final: public IMatrix,
-                             public std::vector<FVector> {
+                             public std::vector<DVector> {
     public:
         using value_type = IMatrix::value_type;
-        using std::vector<FVector>::vector;
+        using std::vector<DVector>::vector;
         DenseMatrix(size_t height, size_t width, const value_type& default_value = {});
 
     public:
-        DenseMatrix& operator*=(value_type scalar) noexcept;
+        DenseMatrix& operator*=(value_type scalar);
         DenseMatrix& operator/=(value_type scalar);
 
         DenseMatrix& operator+=(const DenseMatrix& other);
@@ -32,10 +32,10 @@ namespace math::linal {
         value_type det() const override;
 
         std::vector<std::pair<size_t, complex_value_type>> get_eigenvalues() const override;
-        std::vector<std::pair<complex_value_type, std::vector<FVector>>> get_eigenvectors() const override;
+        std::vector<std::pair<complex_value_type, std::vector<DVector>>> get_eigenvectors() const override;
 
         static DenseMatrix identity_matrix(size_t n);
-        static DenseMatrix elementary_matrix_unit(size_t n, size_t m, size_t i, size_t j);
+        static DenseMatrix elementary_matrix_unit(size_t n, size_t m, size_t i, size_t j, double value = 1.0);
     };
 
     bool operator==(const DenseMatrix& m1, const DenseMatrix& m2);
@@ -45,8 +45,8 @@ namespace math::linal {
     DenseMatrix operator*(DenseMatrix::value_type scalar, const DenseMatrix& matrix);
     DenseMatrix operator/(const DenseMatrix& matrix, DenseMatrix::value_type scalar);
 
-    FVector operator*(const DenseMatrix& matrix, const FVector& vector);
-    FVector operator*(const FVector& vector, const DenseMatrix& matrix);
+    DVector operator*(const DenseMatrix& matrix, const DVector& vector);
+    DVector operator*(const DVector& vector, const DenseMatrix& matrix);
 
     DenseMatrix operator*(const DenseMatrix& m1, const DenseMatrix& m2);
 

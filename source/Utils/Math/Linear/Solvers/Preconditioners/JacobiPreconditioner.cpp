@@ -6,8 +6,8 @@
 
 class math::linal::JacobiPreconditioner::Impl : public math::linal::IPreconditioner::IImpl {
 public:
-    FVector apply(const FVector& x) const override {
-        FVector result(x.size());
+    DVector apply(const DVector& x) const override {
+        DVector result(x.size());
         for (size_t i = 0; i < x.size(); ++i) {
             result[i] = x[i] * m_inverse_diagonal[i];
         }
@@ -15,7 +15,7 @@ public:
     }
 
 protected:
-    FVector m_inverse_diagonal;
+    DVector m_inverse_diagonal;
 };
 
 namespace {

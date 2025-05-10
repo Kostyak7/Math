@@ -13,7 +13,7 @@ namespace math::linal {
         {
         }
 
-        bool is_converged(const FVector& residual, double rhs_norm, size_t /*iteration*/) const override {
+        bool is_converged(const DVector& residual, double rhs_norm, size_t /*iteration*/) const override {
             if (rhs_norm < m_tolerance)
                 rhs_norm = 1.0;
             return residual.norm() / rhs_norm < m_tolerance;
@@ -30,7 +30,7 @@ namespace math::linal {
         {
         }
 
-        bool is_converged(const FVector& residual, double /*rhs_norm*/, size_t /*iteration*/) const override {
+        bool is_converged(const DVector& residual, double /*rhs_norm*/, size_t /*iteration*/) const override {
             return residual.norm() < m_tolerance;
         }
 
@@ -45,7 +45,7 @@ namespace math::linal {
         {
         }
 
-        bool is_converged(const FVector& residual, double /*rhs_norm*/, size_t /*iteration*/) const override {
+        bool is_converged(const DVector& residual, double /*rhs_norm*/, size_t /*iteration*/) const override {
             double max_component = 0.0;
             for (double val : residual)
                 max_component = std::max(max_component, std::abs(val));
@@ -63,7 +63,7 @@ namespace math::linal {
         {
         }
 
-        bool is_converged(const FVector& residual, double rhs_norm, size_t iteration) const override {
+        bool is_converged(const DVector& residual, double rhs_norm, size_t iteration) const override {
             for (const auto& criterion : m_criterions) {
                 if (criterion->is_converged(residual, rhs_norm, iteration))
                     return true;

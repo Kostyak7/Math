@@ -4,34 +4,25 @@
 
 namespace math::geom {
 
-    class Line2D {
-    public:
-        Point2D p1, p2;
+    template <size_t N>
+    struct Line {
+        using value_type = typename Point<N>::value_type;
+        Point<N> p1, p2;
 
-        Line2D(const Vector2D& vec);
-        Line2D(const Point2D& point);
-        Line2D(const Point2D& p1, const Point2D& p2);
+        Line(const Vector<N>& vec);
+        Line(const Point<N>& point);
+        Line(const Point<N>& p1, const Point<N>& p2);
 
-        Point2D::value_type length() const;
-        bool contains(const Point2D& point) const;
-        bool parallel(const Line2D& other) const;
-        bool collinear(const Line2D& other) const;
-        bool perpendicular(const Line2D& other) const;
+        value_type length() const;
+        bool contains(const Point<N>& point) const;
+        bool parallel(const Line<N>& other) const;
+        bool collinear(const Line<N>& other) const;
+        bool perpendicular(const Line<N>& other) const;
     };
 
-    class Line3D {
-    public:
-        Point3D p1, p2;
-
-        Line3D(const Vector3D& vec);
-        Line3D(const Point3D& point);
-        Line3D(const Point3D& p1, const Point3D& p2);
-
-        Point3D::value_type length() const;
-        bool contains(const Point3D& point) const;
-        bool parallel(const Line3D& other) const;
-        bool collinear(const Line3D& other) const;
-        bool perpendicular(const Line3D& other) const;
-    };
+    using Line2D = Line<2>;
+    using Line3D = Line<3>;
 
 } // namespace math::geom
+
+#include "Line.hpp"

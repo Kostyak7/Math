@@ -17,7 +17,7 @@ math::linal::SparseMatrix::SparseMatrix(const SparseMatrix& matrix)
 {
 }
 
-math::linal::SparseMatrix::SparseMatrix(SparseMatrix&& matrix) noexcept {
+math::linal::SparseMatrix::SparseMatrix(SparseMatrix&& matrix) {
     swap(matrix);
 }
 
@@ -216,8 +216,8 @@ std::vector<std::pair<size_t, math::linal::SparseMatrix::complex_value_type>> ma
     return eigenvalues;
 }
 
-std::vector<std::pair<math::linal::SparseMatrix::complex_value_type, std::vector<math::linal::FVector>>> math::linal::SparseMatrix::get_eigenvectors() const {
-    std::vector<std::pair<complex_value_type, std::vector<math::linal::FVector>>> eigenvectors;
+std::vector<std::pair<math::linal::SparseMatrix::complex_value_type, std::vector<math::linal::DVector>>> math::linal::SparseMatrix::get_eigenvectors() const {
+    std::vector<std::pair<complex_value_type, std::vector<math::linal::DVector>>> eigenvectors;
     auto eigenvalues = get_eigenvalues();
     // ...
     return eigenvectors;
@@ -231,9 +231,9 @@ math::linal::SparseMatrix math::linal::SparseMatrix::identity_matrix(size_t n) {
     return res;
 }
 
-math::linal::SparseMatrix math::linal::SparseMatrix::elementary_matrix_unit(size_t n, size_t m, size_t i, size_t j) {
+math::linal::SparseMatrix math::linal::SparseMatrix::elementary_matrix_unit(size_t n, size_t m, size_t i, size_t j, double value) {
     SparseMatrix res(n, m);
-    res.set(i, j, 1.0);
+    res.set(i, j, value);
     return res;
 }
 
@@ -284,35 +284,31 @@ math::linal::SparseMatrix math::linal::operator*(const SparseMatrix& matrix, Spa
 }
 
 math::linal::SparseMatrix math::linal::operator*(SparseMatrix::value_type scalar, const SparseMatrix& matrix) {
-    SparseMatrix res(matrix);
-    res *= scalar;
-    return res;
+    return matrix * scalar;
 }
 
 math::linal::SparseMatrix math::linal::operator/(const SparseMatrix& matrix, SparseMatrix::value_type scalar) {
-    SparseMatrix res(matrix);
-    res /= scalar;
-    return res;
+    return matrix * (1. / scalar);
 }
 
-math::linal::FVector math::linal::operator*(const SparseMatrix& matrix, const FVector& vector) {
+math::linal::DVector math::linal::operator*(const SparseMatrix& matrix, const DVector& vector) {
     if (matrix.get_width() != vector.size()) {
         throw std::invalid_argument("The matrix and the vector must be the same size");
     }
 
-    FVector res(matrix.get_height(), 0.0);
+    DVector res(matrix.get_height(), 0.0);
     for (const auto& [key, value] : matrix.m_data) {
         res[key.first] += value * vector[key.second];
     }
     return res;
 }
 
-math::linal::FVector math::linal::operator*(const FVector& vector, const SparseMatrix& matrix) {
+math::linal::DVector math::linal::operator*(const DVector& vector, const SparseMatrix& matrix) {
     if (matrix.get_height() != vector.size()) {
         throw std::invalid_argument("The matrix and the vector must be the same size");
     }
 
-    FVector res(matrix.get_width(), 0.0);
+    DVector res(matrix.get_width(), 0.0);
     for (const auto& [key, value] : matrix.m_data) {
         res[key.second] += value * vector[key.first];
     }
@@ -329,7 +325,7 @@ math::linal::SparseMatrix math::linal::operator*(const SparseMatrix& m1, const S
 
     SparseMatrix res(n, p);
 
-    // Для эффективного доступа к столбцам m2 предварительно группируем их
+    // Р”Р»СЏ СЌС„С„РµРєС‚РёРІРЅРѕРіРѕ РґРѕСЃС‚СѓРїР° Рє СЃС‚РѕР»Р±С†Р°Рј m2 РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅРѕ РіСЂСѓРїРїРёСЂСѓРµРј РёС…
     std::vector<std::unordered_map<size_t, SparseMatrix::value_type>> m2_cols(p);
     for (const auto& [key, val] : m2.m_data) {
         m2_cols[key.second][key.first] = val;

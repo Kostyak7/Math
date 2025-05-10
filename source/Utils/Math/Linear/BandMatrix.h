@@ -5,17 +5,17 @@
 namespace math::linal {
 
     /**
-     @brief Ленточная матрица особого вида
-     @details Симметричная, хранятся только строки начиная с диагонального элемента
+     @brief Р›РµРЅС‚РѕС‡РЅР°СЏ РјР°С‚СЂРёС†Р° РѕСЃРѕР±РѕРіРѕ РІРёРґР°
+     @details РЎРёРјРјРµС‚СЂРёС‡РЅР°СЏ, С…СЂР°РЅСЏС‚СЃСЏ С‚РѕР»СЊРєРѕ СЃС‚СЂРѕРєРё РЅР°С‡РёРЅР°СЏ СЃ РґРёР°РіРѕРЅР°Р»СЊРЅРѕРіРѕ СЌР»РµРјРµРЅС‚Р°
     */
     class BandMatrix final: public IMatrix, 
-                            public std::vector<FVector> {
+                            public std::vector<DVector> {
     public:
         using value_type = IMatrix::value_type;
-        using std::vector<FVector>::vector;
+        using std::vector<DVector>::vector;
 
     public:
-        BandMatrix& operator*=(value_type scalar) noexcept;
+        BandMatrix& operator*=(value_type scalar);
         BandMatrix& operator/=(value_type scalar);
 
         BandMatrix& operator+=(const BandMatrix& other);
@@ -42,10 +42,10 @@ namespace math::linal {
         value_type det() const override;
 
         std::vector<std::pair<size_t, complex_value_type>> get_eigenvalues() const override;
-        std::vector<std::pair<complex_value_type, std::vector<FVector>>> get_eigenvectors() const override;
+        std::vector<std::pair<complex_value_type, std::vector<DVector>>> get_eigenvectors() const override;
 
         static BandMatrix identity_matrix(size_t n, size_t isl = 1);
-        static BandMatrix elementary_matrix_unit(size_t n, size_t i, size_t j);
+        static BandMatrix elementary_matrix_unit(size_t n, size_t i, size_t j, double value = 1.0);
     };
 
     bool operator==(const BandMatrix& m1, const BandMatrix& m2);
@@ -55,8 +55,8 @@ namespace math::linal {
     BandMatrix operator*(BandMatrix::value_type scalar, const BandMatrix& matrix);
     BandMatrix operator/(const BandMatrix& matrix, BandMatrix::value_type scalar);
 
-    FVector operator*(const BandMatrix& matrix, const FVector& vector);
-    FVector operator*(const FVector& vector, const BandMatrix& matrix);
+    DVector operator*(const BandMatrix& matrix, const DVector& vector);
+    DVector operator*(const DVector& vector, const BandMatrix& matrix);
 
     BandMatrix operator*(const BandMatrix& m1, const BandMatrix& m2);
 

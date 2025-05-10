@@ -27,7 +27,7 @@ namespace math::linal {
         SparseMatrix& operator=(const SparseMatrix& other);
         SparseMatrix& operator=(SparseMatrix&& other);
 
-        SparseMatrix& operator*=(value_type scalar) noexcept;
+        SparseMatrix& operator*=(value_type scalar);
         SparseMatrix& operator/=(value_type scalar);
 
         SparseMatrix& operator+=(const SparseMatrix& other);
@@ -52,12 +52,12 @@ namespace math::linal {
         value_type det() const override;
 
         std::vector<std::pair<size_t, complex_value_type>> get_eigenvalues() const override;
-        std::vector<std::pair<complex_value_type, std::vector<FVector>>> get_eigenvectors() const override;
+        std::vector<std::pair<complex_value_type, std::vector<DVector>>> get_eigenvectors() const override;
 
         void swap(SparseMatrix& other) noexcept;
 
         static SparseMatrix identity_matrix(size_t n);
-        static SparseMatrix elementary_matrix_unit(size_t n, size_t m, size_t i, size_t j);
+        static SparseMatrix elementary_matrix_unit(size_t n, size_t m, size_t i, size_t j, double value = 1.0);
 
     private:
         size_t m_width = 0;
@@ -67,8 +67,8 @@ namespace math::linal {
     private:
         friend bool operator==(const SparseMatrix& m1, const SparseMatrix& m2);
 
-        friend FVector operator*(const SparseMatrix& matrix, const FVector& vector);
-        friend FVector operator*(const FVector& vector, const SparseMatrix& matrix);
+        friend DVector operator*(const SparseMatrix& matrix, const DVector& vector);
+        friend DVector operator*(const DVector& vector, const SparseMatrix& matrix);
 
         friend SparseMatrix operator*(const SparseMatrix& m1, const SparseMatrix& m2);
 
@@ -84,8 +84,8 @@ namespace math::linal {
     SparseMatrix operator*(SparseMatrix::value_type scalar, const SparseMatrix& matrix);
     SparseMatrix operator/(const SparseMatrix& matrix, SparseMatrix::value_type scalar);
 
-    FVector operator*(const SparseMatrix& matrix, const FVector& vector);
-    FVector operator*(const FVector& vector, const SparseMatrix& matrix);
+    DVector operator*(const SparseMatrix& matrix, const DVector& vector);
+    DVector operator*(const DVector& vector, const SparseMatrix& matrix);
 
     SparseMatrix operator*(const SparseMatrix& m1, const SparseMatrix& m2);
 

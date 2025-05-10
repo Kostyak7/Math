@@ -4,81 +4,61 @@
 
 namespace math::geom {
 
-    class Vector2D {
-    public:
-        using value_type = Point2D::value_type;
+    template <size_t N>
+    struct Vector : public std::array<double, N> {
+        using value_type = double;
+        using base_type = std::array<value_type, N>;
+        using base_type::base_type;
+        Vector(const Point<N, value_type>& to);
+        Vector(const Point<N, value_type>& from, const Point<N, value_type>& to);
+        Vector(std::initializer_list<value_type> init);
 
-        value_type x, y;
+        Vector& operator*=(value_type scalar);
+        Vector& operator/=(value_type scalar);
 
-        Vector2D(value_type x = 0.0, value_type y = 0.0);
-        Vector2D(const Point2D& to);
-        Vector2D(const Point2D& from, const Point2D& to);
+        Vector& operator+=(const Vector& other);
+        Vector& operator-=(const Vector& other);
 
-        const value_type& operator[](size_t index) const;
-        value_type& operator[](size_t index);
+        bool is_zero() const;
 
-        Vector2D normalized() const;
+        value_type x() const;
+        value_type y() const;
+        value_type z() const;
+        value_type w() const;
+
+        value_type dot(const Vector& other) const;
         value_type norm() const;
         value_type length() const;
-        value_type dot(const Vector2D& other) const;
-        value_type pseudodot(const Vector2D& other) const;
+
+        Vector& normalize();
     };
 
-    Vector2D operator+(const Vector2D& v1, const Vector2D& v2);
-    Vector2D operator-(const Vector2D& v1, const Vector2D& v2);
-    Vector2D operator*(const Vector2D& vec, Vector2D::value_type scalar);
-    Vector2D operator*(Vector2D::value_type scalar, const Vector2D& vec);
-    Vector2D operator/(const Vector2D& vec, Vector2D::value_type scalar);
+    template <size_t N>
+    Vector<N> operator*(const Vector<N>& vec, typename Vector<N>::value_type scalar);
+    template <size_t N>
+    Vector<N> operator*(typename Vector<N>::value_type scalar, const Vector<N>& vec);
+    template <size_t N>
+    Vector<N> operator/(const Vector<N>& vec, typename Vector<N>::value_type scalar);
 
-    class Vector3D {
-    public:
-        using value_type = Point3D::value_type;
+    template <size_t N>
+    Vector<N> operator+(const Vector<N>& v1, const Vector<N>& v2);
+    template <size_t N>
+    Vector<N> operator-(const Vector<N>& v1, const Vector<N>& v2);
 
-        value_type x, y, z;
+    template <size_t N>
+    Vector<N> operator-(const Vector<N>& vec);
 
-        Vector3D(value_type x = 0.0, value_type y = 0.0, value_type z = 0.0);
-        Vector3D(const Point3D& to);
-        Vector3D(const Point3D& from, const Point3D& to);
+    template <size_t N>
+    Vector<N> normalized(const Vector<N>& vector);
 
-        const value_type& operator[](size_t index) const;
-        value_type& operator[](size_t index);
+    using Vector2D = Vector<2>;
+    using Vector3D = Vector<3>;
+    using Vector4D = Vector<4>;
 
-        Vector3D normalized() const;
-        value_type norm() const;
-        value_type length() const;
-        value_type dot(const Vector3D& other) const;
-        value_type cross(const Vector3D& other) const;
-    };
+    inline Vector2D::value_type pseudodot(const Vector2D& v1, const Vector2D& v2);
 
-    Vector3D operator+(const Vector3D& v1, const Vector3D& v2);
-    Vector3D operator-(const Vector3D& v1, const Vector3D& v2);
-    Vector3D operator*(const Vector3D& vec, Vector3D::value_type scalar);
-    Vector3D operator*(Vector3D::value_type scalar, const Vector3D& vec);
-    Vector3D operator/(const Vector3D& vec, Vector3D::value_type scalar);
-
-    class Vector4D {
-    public:
-        using value_type = Point4D::value_type;
-
-        value_type x, y, z, w;
-
-        Vector4D(value_type x = 0.0, value_type y = 0.0, value_type z = 0.0, value_type w = 0.0);
-        Vector4D(const Point4D& to);
-        Vector4D(const Point4D& from, const Point4D& to);
-
-        const value_type& operator[](size_t index) const;
-        value_type& operator[](size_t index);
-
-        Vector4D normalized() const;
-        value_type norm() const;
-        value_type length() const;
-        value_type dot(const Vector4D& other) const;
-    };
-
-    Vector4D operator+(const Vector4D& v1, const Vector4D& v2);
-    Vector4D operator-(const Vector4D& v1, const Vector4D& v2);
-    Vector4D operator*(const Vector4D& vec, Vector4D::value_type scalar);
-    Vector4D operator*(Vector4D::value_type scalar, const Vector4D& vec);
-    Vector4D operator/(const Vector4D& vec, Vector4D::value_type scalar);
+    inline Vector3D cross_product(const Vector3D& v1, const Vector3D& v2);
 
 } // namespace math::geom
+
+#include "Vector.hpp"

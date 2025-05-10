@@ -4,7 +4,7 @@
 
 namespace {
 
-    void do_sor_step(const math::linal::BandMatrix& matrix, math::linal::FVector& x, const math::linal::FVector& rhs, double w) {
+    void do_sor_step(const math::linal::BandMatrix& matrix, math::linal::DVector& x, const math::linal::DVector& rhs, double w) {
         const size_t n = matrix.get_height();
         const size_t isl = matrix.get_isl();
 
@@ -27,7 +27,7 @@ namespace {
         }
     }
 
-    void do_sor_step(const math::linal::DenseMatrix& matrix, math::linal::FVector& x, const math::linal::FVector& rhs, double w) {
+    void do_sor_step(const math::linal::DenseMatrix& matrix, math::linal::DVector& x, const math::linal::DVector& rhs, double w) {
         const size_t n = matrix.get_height();
 
         for (size_t i = 0; i < n; ++i) {
@@ -41,7 +41,7 @@ namespace {
         }
     }
 
-    void do_sor_step(const math::linal::SparseMatrix& matrix, math::linal::FVector& x, const math::linal::FVector& rhs, double w) {
+    void do_sor_step(const math::linal::SparseMatrix& matrix, math::linal::DVector& x, const math::linal::DVector& rhs, double w) {
         const size_t n = matrix.get_height();
 
         // ...
@@ -62,8 +62,8 @@ math::linal::SORLinearSystemSolver::SORLinearSystemSolver(double w, size_t auto_
     }
 }
 
-math::linal::FVector math::linal::SORLinearSystemSolver::solve(const AnyMatrix& matrix, const FVector& rhs, const FVector& x0) {
-    return std::visit([this, &rhs, &x0](const auto& matrix) -> FVector {
+math::linal::DVector math::linal::SORLinearSystemSolver::solve(const AnyMatrix& matrix, const DVector& rhs, const DVector& x0) {
+    return std::visit([this, &rhs, &x0](const auto& matrix) -> DVector {
         auto [need_to_solve, x, rhs_norm, r, r_norm, resid] = init_method(matrix, rhs, x0);
         if (!need_to_solve) {
             return x;
@@ -72,7 +72,7 @@ math::linal::FVector math::linal::SORLinearSystemSolver::solve(const AnyMatrix& 
         const size_t n = rhs.size();
         const size_t max_iteration_count = get_max_iteration_count(n);
 
-        FVector z;
+        DVector z;
 
         size_t iter = 0;
         do {
@@ -80,7 +80,7 @@ math::linal::FVector math::linal::SORLinearSystemSolver::solve(const AnyMatrix& 
 
             do_sor_step(matrix, x, z, m_w);
 
-            // Автоматическая адаптация параметра релаксации
+            // РђРІС‚РѕРјР°С‚РёС‡РµСЃРєР°СЏ Р°РґР°РїС‚Р°С†РёСЏ РїР°СЂР°РјРµС‚СЂР° СЂРµР»Р°РєСЃР°С†РёРё
             if (m_auto_tune_period != 0 && iter % m_auto_tune_period == 0) {
                 adapt_relaxation_parameter(resid);
             }
@@ -99,7 +99,7 @@ math::linal::FVector math::linal::SORLinearSystemSolver::solve(const AnyMatrix& 
 void math::linal::SORLinearSystemSolver::adapt_relaxation_parameter(double residual) {
     static double last_residual = std::numeric_limits<double>::max();
 
-    if (residual >= last_residual * 0.99) { // чисто эвристика
+    if (residual >= last_residual * 0.99) { // С‡РёСЃС‚Рѕ СЌРІСЂРёСЃС‚РёРєР°
         m_w = std::max(0.95, m_w * 0.95);
     }
     else {

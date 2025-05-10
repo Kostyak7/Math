@@ -6,7 +6,7 @@
 
 namespace {
 
-    void forward_elimination(math::linal::BandMatrix& matrix, math::linal::FVector& rhs) {
+    void forward_elimination(math::linal::BandMatrix& matrix, math::linal::DVector& rhs) {
         int s, m, k, j;
         const size_t n = rhs.size();
         const size_t isl = matrix.get_isl();
@@ -44,7 +44,7 @@ namespace {
         return;
     }
 
-    void backward_substitution(const math::linal::BandMatrix& matrix, math::linal::FVector& rhs) {
+    void backward_substitution(const math::linal::BandMatrix& matrix, math::linal::DVector& rhs) {
         const size_t n = rhs.size();
         const size_t isl = matrix.get_isl();
 
@@ -58,19 +58,19 @@ namespace {
         }
     }
 
-    void forward_elimination(math::linal::DenseMatrix& matrix, math::linal::FVector& rhs) {
+    void forward_elimination(math::linal::DenseMatrix& matrix, math::linal::DVector& rhs) {
         // ...
     }
 
-    void backward_substitution(const math::linal::DenseMatrix& matrix, math::linal::FVector& rhs) {
+    void backward_substitution(const math::linal::DenseMatrix& matrix, math::linal::DVector& rhs) {
         // ...
     }
 
-    void forward_elimination(math::linal::SparseMatrix& matrix, math::linal::FVector& rhs) {
+    void forward_elimination(math::linal::SparseMatrix& matrix, math::linal::DVector& rhs) {
         // ...
     }
 
-    void backward_substitution(const math::linal::SparseMatrix& matrix, math::linal::FVector& rhs) {
+    void backward_substitution(const math::linal::SparseMatrix& matrix, math::linal::DVector& rhs) {
         // ...
     }
 
@@ -81,14 +81,14 @@ math::linal::GaussLinearSystemSolver::GaussLinearSystemSolver(const Params& para
 {
 }
 
-math::linal::FVector math::linal::GaussLinearSystemSolver::solve(const AnyMatrix& matrix, const FVector& rhs, const FVector& /*x0*/) {
-    return std::visit([this, &rhs](const auto& matrix) -> FVector {
+math::linal::DVector math::linal::GaussLinearSystemSolver::solve(const AnyMatrix& matrix, const DVector& rhs, const DVector& /*x0*/) {
+    return std::visit([this, &rhs](const auto& matrix) -> DVector {
         if (!slae_check(matrix, rhs)) {
             return {};
         }
 
         auto augmented_matrix = matrix;
-        FVector solution = rhs;
+        DVector solution = rhs;
 
         forward_elimination(augmented_matrix, solution);
 

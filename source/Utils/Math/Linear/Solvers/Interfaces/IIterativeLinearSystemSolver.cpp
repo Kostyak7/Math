@@ -15,7 +15,7 @@ math::linal::IIterativeLinearSystemSolver::SolutionStats math::linal::IIterative
     return m_solution_stats;
 }
 
-math::linal::IIterativeLinearSystemSolver::Data math::linal::IIterativeLinearSystemSolver::init_method(const AnyMatrix& matrix, const FVector& rhs, const FVector& x0) {
+math::linal::IIterativeLinearSystemSolver::Data math::linal::IIterativeLinearSystemSolver::init_method(const AnyMatrix& matrix, const DVector& rhs, const DVector& x0) {
     return std::visit([this, &rhs, &x0](const auto& matrix) -> Data {
         Data res{ false, {}, 0.0, {}, 0.0, 0.0 };
         if (!slae_check(matrix, rhs)) {
@@ -33,10 +33,10 @@ math::linal::IIterativeLinearSystemSolver::Data math::linal::IIterativeLinearSys
         res.rhs_norm = rhs.norm();
         if (m_iterative_solving_params.additional_prechecks && res.rhs_norm < m_iterative_solving_params.tolerance) {
             collect_solution_stats({ 0.0, 0 });
-            res.x = FVector(n, 0.0);
+            res.x = DVector(n, 0.0);
             return res;
         }
-        res.x = (x0.size() != n) ? FVector(n, 0.0) : x0;
+        res.x = (x0.size() != n) ? DVector(n, 0.0) : x0;
 
         res.r = rhs - matrix * res.x;
         res.r_norm = res.r.norm();
@@ -59,11 +59,11 @@ void math::linal::IIterativeLinearSystemSolver::init_preconditioner(const AnyMat
     }
 }
 
-math::linal::FVector math::linal::IIterativeLinearSystemSolver::apply_precondition(const FVector& vector) const {
+math::linal::DVector math::linal::IIterativeLinearSystemSolver::apply_precondition(const DVector& vector) const {
     return m_preconditioner ? m_preconditioner->apply(vector) : vector;
 }
 
-bool math::linal::IIterativeLinearSystemSolver::check_convergence_criterion(const FVector& residual, double rhs_norm, size_t iteration) const {
+bool math::linal::IIterativeLinearSystemSolver::check_convergence_criterion(const DVector& residual, double rhs_norm, size_t iteration) const {
     static auto default_convergence_criterion = std::make_unique<RelativeResidualCriterion>(m_iterative_solving_params.tolerance);
     if (m_iterative_solving_params.convergence_criterion) {
         return m_iterative_solving_params.convergence_criterion->is_converged(residual, rhs_norm, iteration);

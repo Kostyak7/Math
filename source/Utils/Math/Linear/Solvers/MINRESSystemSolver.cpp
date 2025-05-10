@@ -7,7 +7,7 @@ math::linal::MINRESLinearSystemSolver::MINRESLinearSystemSolver(size_t Krylov_su
 {
 }
 
-bool math::linal::MINRESLinearSystemSolver::slae_check(const AnyMatrix& matrix, const FVector& rhs) const {
+bool math::linal::MINRESLinearSystemSolver::slae_check(const AnyMatrix& matrix, const DVector& rhs) const {
     return std::visit([this, &rhs](const auto& matrix) -> bool {
         if (IKrylovTypeLinearSystemSolver::slae_check(matrix, rhs)) {
             return true;
@@ -21,8 +21,8 @@ bool math::linal::MINRESLinearSystemSolver::slae_check(const AnyMatrix& matrix, 
         }, matrix);
 }
 
-math::linal::FVector math::linal::MINRESLinearSystemSolver::solve(const AnyMatrix& matrix, const FVector& rhs, const FVector& x0) {
-    return std::visit([this, &rhs, &x0](const auto& matrix) -> FVector {
+math::linal::DVector math::linal::MINRESLinearSystemSolver::solve(const AnyMatrix& matrix, const DVector& rhs, const DVector& x0) {
+    return std::visit([this, &rhs, &x0](const auto& matrix) -> DVector {
         auto [need_to_solve, x, rhs_norm, r, r_norm, resid] = init_method(matrix, rhs, x0);
         if (!need_to_solve) {
             return x;
@@ -31,36 +31,36 @@ math::linal::FVector math::linal::MINRESLinearSystemSolver::solve(const AnyMatri
         const size_t n = rhs.size();
         const size_t max_iteration_count = get_max_iteration_count(n);
 
-        FVector v_new = std::move(r);
-        FVector w_new = apply_precondition(v_new);
+        DVector v_new = std::move(r);
+        DVector w_new = apply_precondition(v_new);
         double beta_new2 = v_new.dot(w_new);
         if (beta_new2 < 0.0) {
             throw std::runtime_error("Preconditioner in MINRES is not positive definite");
         }
 
-        FVector v_old(n, 0.0);
-        FVector v(n, 0.0);
+        DVector v_old(n, 0.0);
+        DVector v(n, 0.0);
         double r_norm2 = r_norm * r_norm;
-        FVector w(n, 0.0);
+        DVector w(n, 0.0);
 
         double beta_new = std::sqrt(beta_new2);
         const double beta_one = beta_new;
 
-        double c = 1.0; // êîñèíóñ âðàùåíèÿ Ãèâåíñà
+        double c = 1.0; // ÐºÐ¾ÑÐ¸Ð½ÑƒÑ Ð²Ñ€Ð°Ñ‰ÐµÐ½Ð¸Ñ Ð“Ð¸Ð²ÐµÐ½ÑÐ°
         double c_old = 1.0;
-        double s = 0.0; // ñèíóñ âðàùåíèÿ Ãèâåíñà
+        double s = 0.0; // ÑÐ¸Ð½ÑƒÑ Ð²Ñ€Ð°Ñ‰ÐµÐ½Ð¸Ñ Ð“Ð¸Ð²ÐµÐ½ÑÐ°
         double s_old = 0.0;
-        FVector p_oold(n, 0.0);
-        FVector p_old(n, 0.0);
-        FVector p = p_old;
+        DVector p_oold(n, 0.0);
+        DVector p_old(n, 0.0);
+        DVector p = p_old;
         double eta = 1.0;
 
-        // ïîðîã ñõîäèìîñòè
+        // Ð¿Ð¾Ñ€Ð¾Ð³ ÑÑ…Ð¾Ð´Ð¸Ð¼Ð¾ÑÑ‚Ð¸
         const double threshold2 = m_iterative_solving_params.tolerance * m_iterative_solving_params.tolerance * rhs_norm * rhs_norm;
 
         size_t iter = 0; 
         for (; iter < max_iteration_count; ++iter) {
-            // Ïðåäîáóñëîâëåííûé àëãîðèòì Ëàíöîøà
+            // ÐŸÑ€ÐµÐ´Ð¾Ð±ÑƒÑÐ»Ð¾Ð²Ð»ÐµÐ½Ð½Ñ‹Ð¹ Ð°Ð»Ð³Ð¾Ñ€Ð¸Ñ‚Ð¼ Ð›Ð°Ð½Ñ†Ð¾ÑˆÐ°
             const double beta = beta_new;
             v_old = v;
             v_new /= beta_new;
@@ -79,7 +79,7 @@ math::linal::FVector math::linal::MINRESLinearSystemSolver::solve(const AnyMatri
             }
             beta_new = std::sqrt(beta_new2);
 
-            // Âðàùåíèå Ãèâåíñà
+            // Ð’Ñ€Ð°Ñ‰ÐµÐ½Ð¸Ðµ Ð“Ð¸Ð²ÐµÐ½ÑÐ°
             const double r2 = s * alpha + c * c_old * beta;
             const double r3 = s_old * beta;
             const double r1_hat = c * alpha - c_old * s * beta;

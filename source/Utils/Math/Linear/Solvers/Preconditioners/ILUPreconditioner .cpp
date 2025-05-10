@@ -6,7 +6,7 @@
 
 class math::linal::ILUPreconditioner::Impl : public math::linal::IPreconditioner::IImpl {
 public:
-    FVector apply(const FVector& x) const override {
+    DVector apply(const DVector& x) const override {
         // ...
         return x;
     }
@@ -19,7 +19,7 @@ namespace {
 
     class BandImpl : public math::linal::ILUPreconditioner::Impl {
         using Matrix = math::linal::BandMatrix;
-        using Vector = math::linal::FVector;
+        using Vector = math::linal::DVector;
 
     public:
         BandImpl(const Matrix& matrix) {
@@ -45,7 +45,7 @@ namespace {
                 }
             }
 
-            // ILU-разложение 
+            // ILU-СЂР°Р·Р»РѕР¶РµРЅРёРµ 
             for (size_t k = 0; k < n; ++k) {
                 double& u_kk = U[k][0];
                 double sum = 0.0;
@@ -64,7 +64,7 @@ namespace {
                 if (math::dcmp(u_kk) == 0) 
                     u_kk = math::TOLERANCE;
 
-                // Обновляем элементы U в строке k
+                // РћР±РЅРѕРІР»СЏРµРј СЌР»РµРјРµРЅС‚С‹ U РІ СЃС‚СЂРѕРєРµ k
                 size_t max_j = std::min(k + isl, n);
                 for (size_t j = k + 1; j < max_j; ++j) {
                     double& u_kj = U[k][j - k];
@@ -82,7 +82,7 @@ namespace {
                     u_kj -= sum;
                 }
 
-                // Обновляем элементы L в столбце k
+                // РћР±РЅРѕРІР»СЏРµРј СЌР»РµРјРµРЅС‚С‹ L РІ СЃС‚РѕР»Р±С†Рµ k
                 size_t max_i = std::min(k + isl, n);
                 for (size_t i = k + 1; i < max_i; ++i) {
                     size_t l_pos = k - (i - L[i].size());
@@ -146,8 +146,8 @@ namespace {
         }
 
     private:
-        std::vector<Vector> L; // Нижняя треугольная матрица (включая диагональ)
-        std::vector<Vector> U; // Верхняя треугольная матрица (включая диагональ)
+        std::vector<Vector> L; // РќРёР¶РЅСЏСЏ С‚СЂРµСѓРіРѕР»СЊРЅР°СЏ РјР°С‚СЂРёС†Р° (РІРєР»СЋС‡Р°СЏ РґРёР°РіРѕРЅР°Р»СЊ)
+        std::vector<Vector> U; // Р’РµСЂС…РЅСЏСЏ С‚СЂРµСѓРіРѕР»СЊРЅР°СЏ РјР°С‚СЂРёС†Р° (РІРєР»СЋС‡Р°СЏ РґРёР°РіРѕРЅР°Р»СЊ)
         size_t isl;
     };
 

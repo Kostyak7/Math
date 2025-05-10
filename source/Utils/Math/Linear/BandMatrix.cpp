@@ -5,7 +5,7 @@
 #include <stdexcept>
 
 
-math::linal::BandMatrix& math::linal::BandMatrix::operator*=(value_type scalar) noexcept {
+math::linal::BandMatrix& math::linal::BandMatrix::operator*=(value_type scalar) {
     for (auto& vec : *this) {
         vec *= scalar;
     }
@@ -189,24 +189,24 @@ std::vector<std::pair<size_t, math::linal::BandMatrix::complex_value_type>> math
     return eigenvalues;
 }
 
-std::vector<std::pair<math::linal::BandMatrix::complex_value_type, std::vector<math::linal::FVector>>> math::linal::BandMatrix::get_eigenvectors() const {
-    std::vector<std::pair<complex_value_type, std::vector<math::linal::FVector>>> eigenvectors;
+std::vector<std::pair<math::linal::BandMatrix::complex_value_type, std::vector<math::linal::DVector>>> math::linal::BandMatrix::get_eigenvectors() const {
+    std::vector<std::pair<complex_value_type, std::vector<math::linal::DVector>>> eigenvectors;
     auto eigenvalues = get_eigenvalues();
     // ...
     return eigenvectors;
 }
 
 math::linal::BandMatrix math::linal::BandMatrix::identity_matrix(size_t n, size_t isl) {
-    BandMatrix res(n, FVector(isl, 0.0));
+    BandMatrix res(n, DVector(isl, 0.0));
     for (auto& row : res) {
         row[0] = 1.0;
     }
     return res;
 }
 
-math::linal::BandMatrix math::linal::BandMatrix::elementary_matrix_unit(size_t n, size_t i, size_t j) {
+math::linal::BandMatrix math::linal::BandMatrix::elementary_matrix_unit(size_t n, size_t i, size_t j, double value) {
     BandMatrix res(n);
-    res.set(i, j, 1.0);
+    res.set(i, j, value);
     return res;
 }
 
@@ -223,7 +223,7 @@ bool math::linal::operator==(const BandMatrix& m1, const BandMatrix& m2) {
             }
         }
         if (m1.get_isl() != m2.get_isl()) {
-            const FVector& vec = (m1.get_isl() < m2.get_isl()) ? m2[row] : m1[row];
+            const DVector& vec = (m1.get_isl() < m2.get_isl()) ? m2[row] : m1[row];
             for (size_t i = min_isl; i < vec.size(); ++i) {
                 if (dcmp(vec[i]) != 0) {
                     return false;
@@ -245,25 +245,21 @@ math::linal::BandMatrix math::linal::operator*(const BandMatrix& matrix, BandMat
 }
 
 math::linal::BandMatrix math::linal::operator*(BandMatrix::value_type scalar, const BandMatrix& matrix) {
-    BandMatrix res(matrix);
-    res *= scalar;
-    return res;
+    return matrix * scalar;
 }
 
 math::linal::BandMatrix math::linal::operator/(const BandMatrix& matrix, BandMatrix::value_type scalar) {
-    BandMatrix res(matrix);
-    res /= scalar;
-    return res;
+    return matrix * (1. / scalar);
 }
 
-math::linal::FVector math::linal::operator*(const BandMatrix& matrix, const FVector& vector) {
+math::linal::DVector math::linal::operator*(const BandMatrix& matrix, const DVector& vector) {
     if (matrix.get_width() != vector.size()) {
         throw std::invalid_argument("The matrix and the vector must be the same size");
     }
 
     size_t n = matrix.get_height();
     size_t w = matrix.get_isl();
-    FVector res(n, 0.0);
+    DVector res(n, 0.0);
 
     for (size_t i = 0; i < n; ++i) {
         for (size_t j = std::max(0, static_cast<int>(i) - static_cast<int>(w)); j <= std::min(n - 1, i + w); ++j) {
@@ -273,7 +269,7 @@ math::linal::FVector math::linal::operator*(const BandMatrix& matrix, const FVec
     return res;
 }
 
-math::linal::FVector math::linal::operator*(const FVector& vector, const BandMatrix& matrix) {
+math::linal::DVector math::linal::operator*(const DVector& vector, const BandMatrix& matrix) {
     return matrix * vector;
 }
 
@@ -284,7 +280,7 @@ math::linal::BandMatrix math::linal::operator*(const BandMatrix& m1, const BandM
 
     size_t n = m1.get_height();
     size_t w = m1.get_isl();  
-    BandMatrix result(n, FVector(w + 1, 0.0)); 
+    BandMatrix result(n, DVector(w + 1, 0.0)); 
 
     for (size_t i = 0; i < n; ++i) {
         for (size_t j = std::max(0, (int)i - (int)w); j <= std::min(n - 1, i + w); ++j) {
@@ -328,9 +324,9 @@ math::linal::BandMatrix math::linal::inversed(const BandMatrix& matrix) {
     }
 
     size_t n = matrix.get_height();
-    BandMatrix L(n, FVector(n, 0.0));
+    BandMatrix L(n, DVector(n, 0.0));
     // ...
-    BandMatrix res(n, FVector(n, 0.0));
+    BandMatrix res(n, DVector(n, 0.0));
     // ...
     return res;
 }

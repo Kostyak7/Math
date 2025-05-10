@@ -7,7 +7,7 @@ math::linal::CGLinearSystemSolver::CGLinearSystemSolver(size_t Krylov_subspace_d
 {
 }
 
-bool math::linal::CGLinearSystemSolver::slae_check(const AnyMatrix& matrix, const FVector& rhs) const {
+bool math::linal::CGLinearSystemSolver::slae_check(const AnyMatrix& matrix, const DVector& rhs) const {
     return std::visit([this, &rhs](const auto& matrix) -> bool {
         if (IKrylovTypeLinearSystemSolver::slae_check(matrix, rhs)) {
             return true;
@@ -21,8 +21,8 @@ bool math::linal::CGLinearSystemSolver::slae_check(const AnyMatrix& matrix, cons
         }, matrix);
 }
 
-math::linal::FVector math::linal::CGLinearSystemSolver::solve(const AnyMatrix& matrix, const FVector& rhs, const FVector& x0) {
-    return std::visit([this, &rhs, &x0](const auto& matrix) -> FVector {
+math::linal::DVector math::linal::CGLinearSystemSolver::solve(const AnyMatrix& matrix, const DVector& rhs, const DVector& x0) {
+    return std::visit([this, &rhs, &x0](const auto& matrix) -> DVector {
         auto [need_to_solve, x, rhs_norm, r, beta, resid] = init_method(matrix, rhs, x0);
         if (!need_to_solve) {
             return x;
@@ -31,9 +31,9 @@ math::linal::FVector math::linal::CGLinearSystemSolver::solve(const AnyMatrix& m
         const size_t n = rhs.size();
         const size_t max_iteration_count = get_max_iteration_count(n);
 
-        FVector p(n);
-        FVector q(n);
-        FVector rhat(n);
+        DVector p(n);
+        DVector q(n);
+        DVector rhat(n);
 
         double rho, rho_prev = 0.0;
 

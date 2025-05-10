@@ -7,8 +7,8 @@ math::linal::FGMRESLinearSystemSolver::FGMRESLinearSystemSolver(size_t Krylov_su
 {
 }
 
-math::linal::FVector math::linal::FGMRESLinearSystemSolver::solve(const AnyMatrix& matrix, const FVector& rhs, const FVector& x0) {
-    return std::visit([this, &rhs, &x0](const auto& matrix) -> FVector {
+math::linal::DVector math::linal::FGMRESLinearSystemSolver::solve(const AnyMatrix& matrix, const DVector& rhs, const DVector& x0) {
+    return std::visit([this, &rhs, &x0](const auto& matrix) -> DVector {
         auto [need_to_solve, x, rhs_norm, r, beta, resid] = init_method(matrix, rhs, x0);
         if (!need_to_solve) {
             return x;
@@ -18,15 +18,15 @@ math::linal::FVector math::linal::FGMRESLinearSystemSolver::solve(const AnyMatri
         const size_t m = get_Krylov_subspace_dimension(n);
         const size_t max_iteration_count = get_max_iteration_count(n);        
 
-        std::vector<FVector> V(m + 1, FVector(n, 0.0));
-        std::vector<FVector> Z(m + 1, FVector(n, 0.0));
+        std::vector<DVector> V(m + 1, DVector(n, 0.0));
+        std::vector<DVector> Z(m + 1, DVector(n, 0.0));
         std::vector<double> H((m + 1) * m);
         std::vector<double> cs(m + 1);
         std::vector<double> sn(m + 1);
         std::vector<double> s(m + 1);
 
         for (size_t j = 1; j <= max_iteration_count;) {
-            V[0] = r / beta; // ÔÂ‚˚È ÓÚÓÌÓÏËÓ‚‡ÌÌ˚È ‚ÂÍÚÓ
+            V[0] = r / beta; // –ø–µ—Ä–≤—ã–π –æ—Ä—Ç–æ–Ω–æ—Ä–º–∏—Ä–æ–≤–∞–Ω–Ω—ã–π –≤–µ–∫—Ç–æ—Ä
 
             s[0] = beta;
             for (size_t i = 1; i <= m; ++i) {
@@ -36,9 +36,9 @@ math::linal::FVector math::linal::FGMRESLinearSystemSolver::solve(const AnyMatri
             for (size_t i = 0; i < m && j <= max_iteration_count; ++i, ++j) {
                 Z[i] = apply_precondition(V[i]);
 
-                FVector w = matrix * Z[i];
+                DVector w = matrix * Z[i];
 
-                // ŒÚÓ„ÓÌ‡ÎËÁ‡ˆËˇ w ÓÚÌÓÒËÚÂÎ¸ÌÓ ÔÂ‰˚‰Û˘Ëı ‚ÂÍÚÓÓ‚ V
+                // –û—Ä—Ç–æ–≥–æ–Ω–∞–ª–∏–∑–∞—Ü–∏—è w –æ—Ç–Ω–æ—Å–∏—Ç–µ–ª—å–Ω–æ –ø—Ä–µ–¥—ã–¥—É—â–∏—Ö –≤–µ–∫—Ç–æ—Ä–æ–≤ V
                 for (size_t k = 0; k <= i; ++k) {
                     H[k + i * (m + 1)] = w.dot(V[k]);
                     w -= V[k] * H[k + i * (m + 1)];
@@ -47,15 +47,15 @@ math::linal::FVector math::linal::FGMRESLinearSystemSolver::solve(const AnyMatri
                 H[(i + 1) + i * (m + 1)] = w.norm();
                 V[i + 1] = w * (1.0 / H[(i + 1) + i * (m + 1)]);
 
-                // œËÏÂÌˇÂÏ ÔÂ‰˚‰Û˘ËÂ ‚‡˘ÂÌËˇ √Ë‚ÂÌÒ‡ Í ÔÓÒÎÂ‰ÌÂÏÛ ÒÚÓÎ·ˆÛ H
+                // –ü—Ä–∏–º–µ–Ω—è–µ–º –ø—Ä–µ–¥—ã–¥—É—â–∏–µ –≤—Ä–∞—â–µ–Ω–∏—è –ì–∏–≤–µ–Ω—Å–∞ –∫ –ø–æ—Å–ª–µ–¥–Ω–µ–º—É —Å—Ç–æ–ª–±—Ü—É H
                 for (size_t k = 0; k < i; ++k) {
                     apply_Givens_rotation(H[k + i * (m + 1)], H[k + 1 + i * (m + 1)], cs[k], sn[k]);
                 }
 
-                // √ÂÌÂËÛÂÏ ÌÓ‚ÓÂ ‚‡˘ÂÌËÂ √Ë‚ÂÌÒ‡
+                // –ì–µ–Ω–µ—Ä–∏—Ä—É–µ–º –Ω–æ–≤–æ–µ –≤—Ä–∞—â–µ–Ω–∏–µ –ì–∏–≤–µ–Ω—Å–∞
                 std::tie(cs[i], sn[i]) = generate_Givens_rotation(H[i + i * (m + 1)], H[(i + 1) + i * (m + 1)]);
 
-                // œËÏÂÌˇÂÏ Â„Ó Í H Ë s
+                // –ü—Ä–∏–º–µ–Ω—è–µ–º –µ–≥–æ –∫ H –∏ s
                 apply_Givens_rotation(H[i + i * (m + 1)], H[(i + 1) + i * (m + 1)], cs[i], sn[i]);
                 apply_Givens_rotation(s[i], s[i + 1], cs[i], sn[i]);
 
@@ -85,8 +85,8 @@ math::linal::FVector math::linal::FGMRESLinearSystemSolver::solve(const AnyMatri
         }, matrix);
 }
 
-// –Â¯ÂÌËÂ ‚ÂıÌÂÈ ÚÂÛ„ÓÎ¸ÌÓÈ ÒËÒÚÂÏ˚ H y = s Ë Ó·ÌÓ‚ÎÂÌËÂ x += Z y
-void math::linal::FGMRESLinearSystemSolver::compute_correction(size_t k, size_t n, const std::vector<double>& H, size_t ldH, const std::vector<double>& s, const std::vector<FVector>& Z, FVector& x) const {
+// –†–µ—à–µ–Ω–∏–µ –≤–µ—Ä—Ö–Ω–µ–π —Ç—Ä–µ—É–≥–æ–ª—å–Ω–æ–π —Å–∏—Å—Ç–µ–º—ã H y = s –∏ –æ–±–Ω–æ–≤–ª–µ–Ω–∏–µ x += Z y
+void math::linal::FGMRESLinearSystemSolver::compute_correction(size_t k, size_t n, const std::vector<double>& H, size_t ldH, const std::vector<double>& s, const std::vector<DVector>& Z, DVector& x) const {
     auto y = solve_H_system(k, H, ldH, s, m_params.throw_exceptions);
 
     for (size_t i = 0; i < k; ++i) {

@@ -5,11 +5,11 @@
 #include <stdexcept>
 
 math::linal::DenseMatrix::DenseMatrix(size_t height, size_t width, const value_type& default_value)
-    : vector(height, FVector(width, default_value))
+    : vector(height, DVector(width, default_value))
 {
 }
 
-math::linal::DenseMatrix& math::linal::DenseMatrix::operator*=(value_type scalar) noexcept {
+math::linal::DenseMatrix& math::linal::DenseMatrix::operator*=(value_type scalar) {
     for (auto& vec : *this) {
         vec *= scalar;
     }
@@ -140,8 +140,8 @@ std::vector<std::pair<size_t, math::linal::DenseMatrix::complex_value_type>> mat
     return eigenvalues;
 }
 
-std::vector<std::pair<math::linal::DenseMatrix::complex_value_type, std::vector<math::linal::FVector>>> math::linal::DenseMatrix::get_eigenvectors() const {
-    std::vector<std::pair<complex_value_type, std::vector<math::linal::FVector>>> eigenvectors;
+std::vector<std::pair<math::linal::DenseMatrix::complex_value_type, std::vector<math::linal::DVector>>> math::linal::DenseMatrix::get_eigenvectors() const {
+    std::vector<std::pair<complex_value_type, std::vector<math::linal::DVector>>> eigenvectors;
     auto eigenvalues = get_eigenvalues();
     // ...
     return eigenvectors;
@@ -155,9 +155,9 @@ math::linal::DenseMatrix math::linal::DenseMatrix::identity_matrix(size_t n) {
     return res;
 }
 
-math::linal::DenseMatrix math::linal::DenseMatrix::elementary_matrix_unit(size_t n, size_t m, size_t i, size_t j) {
+math::linal::DenseMatrix math::linal::DenseMatrix::elementary_matrix_unit(size_t n, size_t m, size_t i, size_t j, double value) {
     DenseMatrix res(n, m);
-    res.set(i, j, 1.0);
+    res.set(i, j, value);
     return res;
 }
 
@@ -168,15 +168,11 @@ math::linal::DenseMatrix math::linal::operator*(const DenseMatrix& matrix, Dense
 }
 
 math::linal::DenseMatrix math::linal::operator*(DenseMatrix::value_type scalar, const DenseMatrix& matrix) {
-    DenseMatrix res(matrix);
-    res *= scalar;
-    return res;
+    return matrix * scalar;
 }
 
 math::linal::DenseMatrix math::linal::operator/(const DenseMatrix& matrix, DenseMatrix::value_type scalar) {
-    DenseMatrix res(matrix);
-    res /= scalar;
-    return res;
+    return matrix * (1. / scalar);
 }
 
 bool math::linal::operator==(const DenseMatrix& m1, const DenseMatrix& m2) {
@@ -196,24 +192,24 @@ bool math::linal::operator!=(const DenseMatrix& m1, const DenseMatrix& m2) {
     return !(m1 == m2);
 }
 
-math::linal::FVector math::linal::operator*(const DenseMatrix& matrix, const FVector& vector) {
+math::linal::DVector math::linal::operator*(const DenseMatrix& matrix, const DVector& vector) {
     if (matrix.get_width() != vector.size()) {
         throw std::invalid_argument("The matrix and the vector must be the same size");
     }
     const size_t n = matrix.get_height();
-    FVector res(n, 0.0);
+    DVector res(n, 0.0);
     for (size_t i = 0; i < n; ++i) {
         res[i] = matrix[i].dot(vector);
     }
     return res;
 }
 
-math::linal::FVector math::linal::operator*(const FVector& vector, const DenseMatrix& matrix) {
+math::linal::DVector math::linal::operator*(const DVector& vector, const DenseMatrix& matrix) {
     if (matrix.get_height() != vector.size()) {
         throw std::invalid_argument("The matrix and the vector must be the same size");
     }
     const size_t n = matrix.get_width();
-    FVector res(n, 0.0);
+    DVector res(n, 0.0);
     for (size_t i = 0; i < n; ++i) {
         for (size_t j = 0; j < matrix.get_height(); ++j) {
             res[i] += vector[j] * matrix[j][i];
@@ -226,7 +222,7 @@ math::linal::DenseMatrix math::linal::operator*(const DenseMatrix& m1, const Den
     if (m1.get_width() != m2.get_height()) {
         throw std::invalid_argument("The matrices must be the same size");
     }
-    DenseMatrix res(m1.get_height(), FVector(m2.get_width()));
+    DenseMatrix res(m1.get_height(), DVector(m2.get_width()));
     for (size_t r = 0; r < res.get_height(); ++r) {
         for (size_t c = 0; c < res.get_width(); ++c) {
             DenseMatrix::value_type s = 0.0;
@@ -262,7 +258,7 @@ math::linal::DenseMatrix math::linal::operator-(const DenseMatrix& matrix) {
 math::linal::DenseMatrix math::linal::inversed(const DenseMatrix& matrix) {
     if (matrix.is_empty()) 
         throw std::invalid_argument("Matrix is empty");
-    if (matrix.get_width() != matrix.get_height()) {
+    if (!matrix.is_sqaure()) {
         throw std::runtime_error("Inverse is defined only for square matrices");
     }
 
@@ -270,7 +266,7 @@ math::linal::DenseMatrix math::linal::inversed(const DenseMatrix& matrix) {
     DenseMatrix inverse = DenseMatrix::identity_matrix(n);
     DenseMatrix temp(matrix);
 
-    // Ïðÿìîé õîä ìåòîäà Ãàóññà
+    // ÐŸÑ€ÑÐ¼Ð¾Ð¹ Ñ…Ð¾Ð´ Ð¼ÐµÑ‚Ð¾Ð´Ð° Ð“Ð°ÑƒÑÑÐ°
     for (size_t i = 0; i < n; ++i) {
         size_t pivot = i;
         for (size_t j = i + 1; j < n; ++j) {

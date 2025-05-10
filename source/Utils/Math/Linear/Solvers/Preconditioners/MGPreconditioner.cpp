@@ -20,9 +20,9 @@ public:
     {
     }
 
-    FVector apply(const FVector& x) const override {
+    DVector apply(const DVector& x) const override {
         if (check_levels()) return x;
-        FVector result(x.size(), 0.0);
+        DVector result(x.size(), 0.0);
         switch (m_params.cycle_type) {
         case CycleType::V_CYCLE: v_cycle(0, x, result); break;
         case CycleType::W_CYCLE: w_cycle(0, x, result); break;
@@ -34,15 +34,15 @@ public:
 protected:
     virtual bool check_levels() const = 0;
 
-    virtual void v_cycle(size_t level_idx, const FVector& rhs, FVector& x) const = 0;
-    virtual void w_cycle(size_t level_idx, const FVector& rhs, FVector& x) const = 0;
-    virtual void f_cycle(size_t level_idx, const FVector& rhs, FVector& x) const = 0;
+    virtual void v_cycle(size_t level_idx, const DVector& rhs, DVector& x) const = 0;
+    virtual void w_cycle(size_t level_idx, const DVector& rhs, DVector& x) const = 0;
+    virtual void f_cycle(size_t level_idx, const DVector& rhs, DVector& x) const = 0;
 
     void coarse_sovler_init() {
         m_coarse_solver = std::make_unique<math::linal::GaussLinearSystemSolver>();
     }
 
-    FVector coarse_solution(const FVector& rhs) const {
+    DVector coarse_solution(const DVector& rhs) const {
         return m_coarse_solver->solve(m_matrix, rhs);
     }
 
@@ -58,7 +58,7 @@ namespace {
 
     class BandImpl final : public math::linal::MGPreconditioner::Impl {
         using Matrix = math::linal::BandMatrix;
-        using Vector = math::linal::FVector;
+        using Vector = math::linal::DVector;
 
     public:
         BandImpl(const Matrix& matrix, const Params& params)
@@ -67,7 +67,7 @@ namespace {
             m_levels.clear();
             m_levels.push_back(matrix);
 
-            // Ñîçäàåì èåðàðõèþ óðîâíåé
+            // Ð¡Ð¾Ð·Ð´Ð°ÐµÐ¼ Ð¸ÐµÑ€Ð°Ñ€Ñ…Ð¸ÑŽ ÑƒÑ€Ð¾Ð²Ð½ÐµÐ¹
             while (m_levels.back().get_width() > m_params.min_coarse_size && m_levels.size() < m_params.max_levels) {
                 Matrix coarse = create_coarse_matrix(m_levels.back());
                 m_levels.push_back(coarse);
@@ -89,25 +89,25 @@ namespace {
 
             const Matrix& A = m_levels[level_idx];
 
-            // Ïðåäâàðèòåëüíîå ñãëàæèâàíèå
+            // ÐŸÑ€ÐµÐ´Ð²Ð°Ñ€Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ð¾Ðµ ÑÐ³Ð»Ð°Ð¶Ð¸Ð²Ð°Ð½Ð¸Ðµ
             for (size_t i = 0; i < m_params.n_pre_smooth; ++i) {
                 smooth(A, rhs, x, level_idx);
             }
 
             Vector residual = rhs - A * x;
 
-            // Îãðàíè÷åíèå íåâÿçêè íà áîëåå ãðóáûé óðîâåíü
+            // ÐžÐ³Ñ€Ð°Ð½Ð¸Ñ‡ÐµÐ½Ð¸Ðµ Ð½ÐµÐ²ÑÐ·ÐºÐ¸ Ð½Ð° Ð±Ð¾Ð»ÐµÐµ Ð³Ñ€ÑƒÐ±Ñ‹Ð¹ ÑƒÑ€Ð¾Ð²ÐµÐ½ÑŒ
             Vector coarse_rhs = restrict(residual, level_idx);
             Vector coarse_correction(coarse_rhs.size(), 0.0);
 
-            // Ðåêóðñèâíûé âûçîâ äëÿ áîëåå ãðóáîãî óðîâíÿ
+            // Ð ÐµÐºÑƒÑ€ÑÐ¸Ð²Ð½Ñ‹Ð¹ Ð²Ñ‹Ð·Ð¾Ð² Ð´Ð»Ñ Ð±Ð¾Ð»ÐµÐµ Ð³Ñ€ÑƒÐ±Ð¾Ð³Ð¾ ÑƒÑ€Ð¾Ð²Ð½Ñ
             v_cycle(level_idx + 1, coarse_rhs, coarse_correction);
 
-            // Èíòåðïîëÿöèÿ êîððåêöèè íà áîëåå òîíêèé óðîâåíü
+            // Ð˜Ð½Ñ‚ÐµÑ€Ð¿Ð¾Ð»ÑÑ†Ð¸Ñ ÐºÐ¾Ñ€Ñ€ÐµÐºÑ†Ð¸Ð¸ Ð½Ð° Ð±Ð¾Ð»ÐµÐµ Ñ‚Ð¾Ð½ÐºÐ¸Ð¹ ÑƒÑ€Ð¾Ð²ÐµÐ½ÑŒ
             Vector correction = interpolate(coarse_correction, level_idx);
             x += correction;
 
-            // Ïîñò-ñãëàæèâàíèå
+            // ÐŸÐ¾ÑÑ‚-ÑÐ³Ð»Ð°Ð¶Ð¸Ð²Ð°Ð½Ð¸Ðµ
             for (size_t i = 0; i < m_params.n_post_smooth; ++i) {
                 smooth(A, rhs, x, level_idx);
             }
@@ -121,26 +121,26 @@ namespace {
 
             const Matrix& A = m_levels[level_idx];
 
-            // Ïðåäâàðèòåëüíîå ñãëàæèâàíèå
+            // ÐŸÑ€ÐµÐ´Ð²Ð°Ñ€Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ð¾Ðµ ÑÐ³Ð»Ð°Ð¶Ð¸Ð²Ð°Ð½Ð¸Ðµ
             for (size_t i = 0; i < m_params.n_pre_smooth; ++i) {
                 smooth(A, rhs, x, level_idx);
             }
 
             Vector residual = rhs - A * x;
 
-            // Îãðàíè÷åíèå íåâÿçêè íà áîëåå ãðóáûé óðîâåíü
+            // ÐžÐ³Ñ€Ð°Ð½Ð¸Ñ‡ÐµÐ½Ð¸Ðµ Ð½ÐµÐ²ÑÐ·ÐºÐ¸ Ð½Ð° Ð±Ð¾Ð»ÐµÐµ Ð³Ñ€ÑƒÐ±Ñ‹Ð¹ ÑƒÑ€Ð¾Ð²ÐµÐ½ÑŒ
             Vector coarse_rhs = restrict(residual, level_idx);
             Vector coarse_correction(coarse_rhs.size(), 0.0);
 
-            // Äâà ðåêóðñèâíûõ âûçîâà äëÿ áîëåå ãðóáîãî óðîâíÿ (W-öèêë)
+            // Ð”Ð²Ð° Ñ€ÐµÐºÑƒÑ€ÑÐ¸Ð²Ð½Ñ‹Ñ… Ð²Ñ‹Ð·Ð¾Ð²Ð° Ð´Ð»Ñ Ð±Ð¾Ð»ÐµÐµ Ð³Ñ€ÑƒÐ±Ð¾Ð³Ð¾ ÑƒÑ€Ð¾Ð²Ð½Ñ (W-Ñ†Ð¸ÐºÐ»)
             w_cycle(level_idx + 1, coarse_rhs, coarse_correction);
             w_cycle(level_idx + 1, coarse_rhs, coarse_correction);
 
-            // Èíòåðïîëÿöèÿ êîððåêöèè íà áîëåå òîíêèé óðîâåíü
+            // Ð˜Ð½Ñ‚ÐµÑ€Ð¿Ð¾Ð»ÑÑ†Ð¸Ñ ÐºÐ¾Ñ€Ñ€ÐµÐºÑ†Ð¸Ð¸ Ð½Ð° Ð±Ð¾Ð»ÐµÐµ Ñ‚Ð¾Ð½ÐºÐ¸Ð¹ ÑƒÑ€Ð¾Ð²ÐµÐ½ÑŒ
             Vector correction = interpolate(coarse_correction, level_idx);
             x += correction;
 
-            // Ïîñò-ñãëàæèâàíèå
+            // ÐŸÐ¾ÑÑ‚-ÑÐ³Ð»Ð°Ð¶Ð¸Ð²Ð°Ð½Ð¸Ðµ
             for (size_t i = 0; i < m_params.n_post_smooth; ++i) {
                 smooth(A, rhs, x, level_idx);
             }
@@ -154,25 +154,25 @@ namespace {
 
             const Matrix& A = m_levels[level_idx];
 
-            // Ïðåäâàðèòåëüíîå ñãëàæèâàíèå
+            // ÐŸÑ€ÐµÐ´Ð²Ð°Ñ€Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ð¾Ðµ ÑÐ³Ð»Ð°Ð¶Ð¸Ð²Ð°Ð½Ð¸Ðµ
             for (size_t i = 0; i < m_params.n_pre_smooth; ++i) {
                 smooth(A, rhs, x, level_idx);
             }
 
             Vector residual = rhs - A * x;
 
-            // Îãðàíè÷åíèå íåâÿçêè íà áîëåå ãðóáûé óðîâåíü
+            // ÐžÐ³Ñ€Ð°Ð½Ð¸Ñ‡ÐµÐ½Ð¸Ðµ Ð½ÐµÐ²ÑÐ·ÐºÐ¸ Ð½Ð° Ð±Ð¾Ð»ÐµÐµ Ð³Ñ€ÑƒÐ±Ñ‹Ð¹ ÑƒÑ€Ð¾Ð²ÐµÐ½ÑŒ
             Vector coarse_rhs = restrict(residual, level_idx);
             Vector coarse_correction(coarse_rhs.size(), 0.0);
 
-            // Ðåêóðñèâíûé âûçîâ F-öèêëà äëÿ áîëåå ãðóáîãî óðîâíÿ
+            // Ð ÐµÐºÑƒÑ€ÑÐ¸Ð²Ð½Ñ‹Ð¹ Ð²Ñ‹Ð·Ð¾Ð² F-Ñ†Ð¸ÐºÐ»Ð° Ð´Ð»Ñ Ð±Ð¾Ð»ÐµÐµ Ð³Ñ€ÑƒÐ±Ð¾Ð³Ð¾ ÑƒÑ€Ð¾Ð²Ð½Ñ
             f_cycle(level_idx + 1, coarse_rhs, coarse_correction);
 
-            // Èíòåðïîëÿöèÿ êîððåêöèè íà áîëåå òîíêèé óðîâåíü
+            // Ð˜Ð½Ñ‚ÐµÑ€Ð¿Ð¾Ð»ÑÑ†Ð¸Ñ ÐºÐ¾Ñ€Ñ€ÐµÐºÑ†Ð¸Ð¸ Ð½Ð° Ð±Ð¾Ð»ÐµÐµ Ñ‚Ð¾Ð½ÐºÐ¸Ð¹ ÑƒÑ€Ð¾Ð²ÐµÐ½ÑŒ
             Vector correction = interpolate(coarse_correction, level_idx);
             x += correction;
 
-            // Äîïîëíèòåëüíîå ñãëàæèâàíèå è V-öèêë
+            // Ð”Ð¾Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ð¾Ðµ ÑÐ³Ð»Ð°Ð¶Ð¸Ð²Ð°Ð½Ð¸Ðµ Ð¸ V-Ñ†Ð¸ÐºÐ»
             for (size_t i = 0; i < m_params.n_post_smooth; ++i) {
                 smooth(A, rhs, x, level_idx);
             }
@@ -184,15 +184,15 @@ namespace {
             correction = interpolate(coarse_correction, level_idx);
             x += correction;
 
-            // Ôèíàëüíîå ïîñò-ñãëàæèâàíèå
+            // Ð¤Ð¸Ð½Ð°Ð»ÑŒÐ½Ð¾Ðµ Ð¿Ð¾ÑÑ‚-ÑÐ³Ð»Ð°Ð¶Ð¸Ð²Ð°Ð½Ð¸Ðµ
             for (size_t i = 0; i < m_params.n_post_smooth; ++i) {
                 smooth(A, rhs, x, level_idx);
             }
         }
 
         Matrix create_coarse_matrix(const Matrix& fine) {
-            // Çäåñü äîëæíà áûòü ðåàëèçàöèÿ ñîçäàíèÿ ãðóáîé ìàòðèöû
-            // Â óïðîùåííîì âèäå (íûíåøíåì) ïðîñòî áåðåòüñÿ êàæäàÿ âòîðàÿ òî÷êï
+            // Ð—Ð´ÐµÑÑŒ Ð´Ð¾Ð»Ð¶Ð½Ð° Ð±Ñ‹Ñ‚ÑŒ Ñ€ÐµÐ°Ð»Ð¸Ð·Ð°Ñ†Ð¸Ñ ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ñ Ð³Ñ€ÑƒÐ±Ð¾Ð¹ Ð¼Ð°Ñ‚Ñ€Ð¸Ñ†Ñ‹
+            // Ð’ ÑƒÐ¿Ñ€Ð¾Ñ‰ÐµÐ½Ð½Ð¾Ð¼ Ð²Ð¸Ð´Ðµ (Ð½Ñ‹Ð½ÐµÑˆÐ½ÐµÐ¼) Ð¿Ñ€Ð¾ÑÑ‚Ð¾ Ð±ÐµÑ€ÐµÑ‚ÑŒÑÑ ÐºÐ°Ð¶Ð´Ð°Ñ Ð²Ñ‚Ð¾Ñ€Ð°Ñ Ñ‚Ð¾Ñ‡ÐºÐ¿
 
             size_t n = fine.get_width();
             size_t coarse_n = (n + 1) / 2;
@@ -220,7 +220,7 @@ namespace {
         }
 
         Vector restrict(const Vector& fine, size_t level_idx) const {
-            // Ïðîñòàÿ èíúåêöèÿ - áåðåì êàæäóþ âòîðóþ òî÷êó
+            // ÐŸÑ€Ð¾ÑÑ‚Ð°Ñ Ð¸Ð½ÑŠÐµÐºÑ†Ð¸Ñ - Ð±ÐµÑ€ÐµÐ¼ ÐºÐ°Ð¶Ð´ÑƒÑŽ Ð²Ñ‚Ð¾Ñ€ÑƒÑŽ Ñ‚Ð¾Ñ‡ÐºÑƒ
             const Matrix& fine_matrix = m_levels[level_idx];
             size_t coarse_n = m_levels[level_idx + 1].get_width();
             Vector coarse(coarse_n, 0.0);
@@ -236,7 +236,7 @@ namespace {
         }
 
         Vector interpolate(const Vector& coarse, size_t level_idx) const {
-            // Ëèíåéíàÿ èíòåðïîëÿöèÿ
+            // Ð›Ð¸Ð½ÐµÐ¹Ð½Ð°Ñ Ð¸Ð½Ñ‚ÐµÑ€Ð¿Ð¾Ð»ÑÑ†Ð¸Ñ
             size_t fine_size = m_levels[level_idx].get_width();
             Vector fine(fine_size, 0.0);
 
@@ -328,7 +328,7 @@ namespace {
 
     class DenseImpl final : public math::linal::MGPreconditioner::Impl {
         using Matrix = math::linal::DenseMatrix;
-        using Vector = math::linal::FVector;
+        using Vector = math::linal::DVector;
 
     public:
         DenseImpl(const Matrix& matrix, const Params& params)
@@ -357,7 +357,7 @@ namespace {
 
     class SparseImpl final : public math::linal::MGPreconditioner::Impl {
         using Matrix = math::linal::SparseMatrix;
-        using Vector = math::linal::FVector;
+        using Vector = math::linal::DVector;
 
     public:
         SparseImpl(const Matrix& matrix, const Params& params)
