@@ -51,6 +51,11 @@ namespace math::geom {
     template <size_t N>
     Vector<N> normalized(const Vector<N>& vector);
 
+    template <size_t N>
+    Vector<N> zero_vector();
+    template <size_t N>
+    Vector<N> unit_vector(size_t i, typename Vector<N>::value_type value = 1.0);
+
     using Vector2D = Vector<2>;
     using Vector3D = Vector<3>;
     using Vector4D = Vector<4>;

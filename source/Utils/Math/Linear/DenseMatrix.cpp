@@ -258,7 +258,7 @@ math::linal::DenseMatrix math::linal::operator-(const DenseMatrix& matrix) {
 math::linal::DenseMatrix math::linal::inversed(const DenseMatrix& matrix) {
     if (matrix.is_empty()) 
         throw std::invalid_argument("Matrix is empty");
-    if (!matrix.is_sqaure()) {
+    if (!matrix.is_square()) {
         throw std::runtime_error("Inverse is defined only for square matrices");
     }
 

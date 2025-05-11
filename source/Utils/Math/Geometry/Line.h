@@ -14,10 +14,13 @@ namespace math::geom {
         Line(const Point<N>& p1, const Point<N>& p2);
 
         value_type length() const;
+
         bool contains(const Point<N>& point) const;
         bool parallel(const Line<N>& other) const;
         bool collinear(const Line<N>& other) const;
         bool perpendicular(const Line<N>& other) const;
+
+        Vector<N> get_vector() const;
     };
 
     using Line2D = Line<2>;

@@ -38,7 +38,7 @@ math::linal::SparseMatrix& math::linal::SparseMatrix::operator=(SparseMatrix&& o
 
 }
 
-math::linal::SparseMatrix& math::linal::SparseMatrix::operator*=(value_type scalar) noexcept {
+math::linal::SparseMatrix& math::linal::SparseMatrix::operator*=(value_type scalar) {
     for (auto& [_, val] : m_data) {
         val *= scalar;
     }

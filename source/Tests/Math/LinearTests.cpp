@@ -4,12 +4,12 @@
 
 using namespace math;
 
-void tests::print_vector(const linal::FVector& vec) {
+void tests::print_vector(const linal::DVector& vec) {
 	std::cout << "[ ";
-	for (size_t i = 0; i < vec.size() - 1; ++i) {
-		std::cout << vec[i] << ", ";
-	}
-	if (vec.size()) {
+	if (!vec.empty()) {
+		for (size_t i = 0; i < vec.size() - 1; ++i) {
+			std::cout << vec[i] << ", ";
+		}
 		std::cout << vec.back();
 	}
 	std::cout << " ]";
@@ -100,8 +100,8 @@ double tests::ITestGenerator::get_random_double() {
 	return dist(gen);
 }
 
-linal::FVector tests::ITestGenerator::get_random_vector(size_t n, const double& sparsity) {
-	linal::FVector vector(n, 0.0);
+linal::DVector tests::ITestGenerator::get_random_vector(size_t n, const double& sparsity) {
+	linal::DVector vector(n, 0.0);
 	for (auto& el : vector) {
 		if (sparsity > 0 || sparsity_dist(gen) > sparsity) {
 			el = get_random_double();

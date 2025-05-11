@@ -74,23 +74,6 @@ namespace math::geom {
     using Matrix3x3 = Matrix<3, 3>;
     using Matrix4x4 = Matrix<4, 4>;
 
-    inline Matrix2x2 rotation_matrix_2d(double angle_rad);
-    inline Matrix3x3 rotation_matrix_x(double angle_rad);
-    inline Matrix3x3 rotation_matrix_y(double angle_rad);
-    inline Matrix3x3 rotation_matrix_z(double angle_rad);
-
-    inline Matrix4x4 orthographic_projection(double left, double right, double bottom, double top, double near, double far);
-    inline Matrix4x4 perspective_projection(double fov_rad, double aspect, double near, double far);
-
-    inline Matrix2x2 scaling_matrix(double sx, double sy);
-    inline Matrix3x3 scaling_matrix(double sx, double sy, double sz);
-    inline Matrix4x4 scaling_matrix(double sx, double sy, double sz, double sw);
-
-    inline Matrix4x4 scale_around_point(float sx, float sy, float sz, float cx, float cy, float cz);
-
-    inline Matrix3x3 translation_matrix(double x, double y);
-    inline Matrix4x4 translation_matrix(double x, double y, double z);
-
 } // namespace math::geom
 
 #include "Matrix.hpp"

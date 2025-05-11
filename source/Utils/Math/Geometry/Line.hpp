@@ -58,3 +58,8 @@ bool math::geom::Line<N>::perpendicular(const Line<N>& other) const {
 
     return fabs(v1.dot(v2)) < std::numeric_limits<Point3D::value_type>::epsilon();
 }
+
+template <size_t N>
+math::geom::Vector<N> math::geom::Line<N>::get_vector() const {
+    return { p2 - p1 };
+}

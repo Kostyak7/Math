@@ -91,7 +91,7 @@ bool math::linal::operator!=(const DVector& v1, const DVector& v2) {
 math::linal::DVector math::linal::operator*(const DVector& vector, DVector::value_type scalar) {
     DVector res(vector);
     res *= scalar;
-    return scalar;
+    return res;
 }
 
 math::linal::DVector math::linal::operator*(DVector::value_type scalar, const DVector& vector) {

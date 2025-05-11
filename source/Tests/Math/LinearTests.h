@@ -23,7 +23,7 @@
 
 namespace tests {
 
-	void print_vector(const math::linal::FVector& vec);
+	void print_vector(const math::linal::DVector& vec);
 
 	template <class TMatrix>
 	void print_matrix(const TMatrix& matrix);
@@ -31,8 +31,8 @@ namespace tests {
 	template <class TMatrix>
 	struct SLAE {
 		TMatrix A;
-		math::linal::FVector solution;
-		math::linal::FVector b;
+		math::linal::DVector solution;
+		math::linal::DVector b;
 	};
 
 	template <class TMatrix>
@@ -42,7 +42,7 @@ namespace tests {
 			size_t index = 0;
 			bool success = false;
 
-			math::linal::FVector x;
+			math::linal::DVector x;
 			std::chrono::microseconds duration = std::chrono::microseconds{ 0 };
 			size_t operation = 0;
 			size_t memory = 0;
@@ -86,7 +86,7 @@ namespace tests {
 	protected:
 		double get_random_ranged_double(double lower_bound = -1000., double upper_bound = 1000., bool can_be_zero = true);
 		double get_random_double();
-		math::linal::FVector get_random_vector(size_t n, const double& sparsity);
+		math::linal::DVector get_random_vector(size_t n, const double& sparsity);
 
 	protected:
 		std::random_device rd;
@@ -200,7 +200,7 @@ namespace tests {
 			//create_solver_tester(slaes, SolverFactory::SolverName::FGMRES,   SolverFactory::PredictionerName::ILU, params), // +
 			//create_solver_tester(slaes, SolverFactory::SolverName::GMRES,    SolverFactory::PredictionerName::ILU, params), // +
 			// 
-			//create_solver_tester(slaes, SolverFactory::SolverName::BiCGSTAB, SolverFactory::PredictionerName::MG, params), // +
+			create_solver_tester(slaes, SolverFactory::SolverName::BiCGSTAB, SolverFactory::PredictionerName::MG, params), // +
 			//create_solver_tester(slaes, SolverFactory::SolverName::CG,       SolverFactory::PredictionerName::MG, params), // +
 			//create_solver_tester(slaes, SolverFactory::SolverName::FGMRES,   SolverFactory::PredictionerName::MG, params), // +
 			//create_solver_tester(slaes, SolverFactory::SolverName::GMRES,    SolverFactory::PredictionerName::MG, params), // +
@@ -222,7 +222,7 @@ namespace tests {
 		SolverTester<TMatrix>::Params params = { true, true, true, false, false, false };
 
 		std::vector<std::shared_ptr<SolverTester<TMatrix>>> testers{
-			create_solver_tester(slaes, SolverFactory::SolverName::Gauss,    SolverFactory::PredictionerName::None, params), // +
+			//create_solver_tester(slaes, SolverFactory::SolverName::Gauss,    SolverFactory::PredictionerName::None, params), // +
 			//create_solver_tester(slaes, SolverFactory::SolverName::BiCGSTAB, SolverFactory::PredictionerName::None, params), // +
 			//create_solver_tester(slaes, SolverFactory::SolverName::CG,       SolverFactory::PredictionerName::None, params), // +
 			//create_solver_tester(slaes, SolverFactory::SolverName::FGMRES,   SolverFactory::PredictionerName::None, params), // +
@@ -237,7 +237,7 @@ namespace tests {
 			//create_solver_tester(slaes, SolverFactory::SolverName::FGMRES,   SolverFactory::PredictionerName::ILU, params), // +
 			//create_solver_tester(slaes, SolverFactory::SolverName::GMRES,    SolverFactory::PredictionerName::ILU, params), // +
 			// 
-			//create_solver_tester(slaes, SolverFactory::SolverName::BiCGSTAB, SolverFactory::PredictionerName::MG, params), // +
+			create_solver_tester(slaes, SolverFactory::SolverName::BiCGSTAB, SolverFactory::PredictionerName::MG, params), // +
 			//create_solver_tester(slaes, SolverFactory::SolverName::CG,       SolverFactory::PredictionerName::MG, params), // +
 			//create_solver_tester(slaes, SolverFactory::SolverName::FGMRES,   SolverFactory::PredictionerName::MG, params), // +
 			//create_solver_tester(slaes, SolverFactory::SolverName::GMRES,    SolverFactory::PredictionerName::MG, params), // +

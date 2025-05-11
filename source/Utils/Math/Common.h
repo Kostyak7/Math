@@ -21,4 +21,25 @@ namespace math {
         return (x > T(0)) - (x < T(0));
     }
 
+    inline double to_radians(double degrees) {
+        return degrees * pi / 180.0;
+    }
+
+    inline double to_degrees(double radians) {
+        return radians * 180.0 / pi;
+    }
+
+    inline double clamp(double value, double min_val, double max_val) {
+        return std::max(min_val, std::min(max_val, value));
+    }
+
+    inline bool is_near(double a, double b, double eps = TOLERANCE) {
+        return fabs(a - b) < eps;
+    }
+
+    inline double lerp(double a, double b, double t) {
+        return a + (b - a) * t;
+    }
+
+
 } // namespace math

@@ -8,13 +8,7 @@
 math::geom::Plane::Plane(const Point3D& p1, const Point3D& p2, const Point3D& p3) {
     Vector3D v1(p1, p2);
     Vector3D v2(p1, p3);
-
-    Vector3D normal = v1.cross(v2);
-
-    value_type length = normal.length();
-    if (length > 0) {
-        normal = normal / length;
-    }
+    Vector3D normal = normalized(cross_product(v1, v2));
 
     a = normal.x;
     b = normal.y;

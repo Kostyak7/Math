@@ -32,7 +32,6 @@ namespace math::geom {
     template <size_t N, typename T>
     Point<N, T> operator/(const Point<N, T>& point, T scalar);
 
-
     using Point2D = Point<2, double>;
     using Point3D = Point<3, double>;
     using Point4D = Point<4, double>;

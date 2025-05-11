@@ -159,11 +159,25 @@ math::geom::Vector<N> math::geom::normalized(const Vector<N>& vec) {
     return res;
 }
 
+template <size_t N>
+math::geom::Vector<N> math::geom::zero_vector() {
+    return {};
+}
+
+template <size_t N>
+math::geom::Vector<N> math::geom::unit_vector(size_t i, typename Vector<N>::value_type value) {
+    Vector<N> res{};
+    if (i < N) {
+        res[i] = value;
+    }
+    return res;
+}
+
 typename math::geom::Vector2D::value_type math::geom::pseudodot(const Vector2D& v1, const Vector2D& v2) {
     return v1.x() * v2.y() - v1.y() * v2.x();
 }
 
-typename math::geom::Vector3D math::geom::cross_product(const Vector3D& v1, const Vector3D& v2) {
+math::geom::Vector3D math::geom::cross_product(const Vector3D& v1, const Vector3D& v2) {
     return {
         v1.y() * v2.z() - v1.z() * v2.y(),
         v1.z() * v2.x() - v1.x() * v2.z(),
