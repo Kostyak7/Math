@@ -9,6 +9,7 @@ namespace math::geom {
         using value_type = double;
         using base_type = std::array<value_type, N>;
         using base_type::base_type;
+
         Vector(const Point<N, value_type>& to);
         Vector(const Point<N, value_type>& from, const Point<N, value_type>& to);
         Vector(std::initializer_list<value_type> init);

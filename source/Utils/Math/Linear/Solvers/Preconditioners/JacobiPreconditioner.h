@@ -8,7 +8,7 @@ namespace math::linal {
 
     class JacobiPreconditioner : public IPreconditioner {
     public:
-        void init(const AnyMatrix& matrix) override;
+        void init(const AnyMatrixConstRef& matrix) override;
         class Impl;
     };
 

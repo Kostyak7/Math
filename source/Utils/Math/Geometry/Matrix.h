@@ -5,16 +5,31 @@
 namespace math::geom {
 
     template <size_t Rows, size_t Columns>
-    struct Matrix : public std::array<Vector<Columns>, Rows> {
-        using value_type = typename Vector<Columns>::value_type;
-        using std::array<Vector<Columns>, Rows>::array;
+    class Matrix {
+    public:
+        using value_type = double;
+        
+        class ConstProxyVector;
+        class ProxyVector;
+
+    public:
+        Matrix();
+        Matrix(const Matrix& matrix);
+        Matrix(Matrix&& matrix) noexcept;
         Matrix(std::initializer_list<std::initializer_list<value_type>> init);
+
+        Matrix& operator=(const Matrix& matrix);
+        Matrix& operator=(Matrix&& matrix) noexcept;
 
         Matrix& operator*=(value_type scalar);
         Matrix& operator/=(value_type scalar);
 
         Matrix& operator+=(const Matrix& other);
         Matrix& operator-=(const Matrix& other);
+
+        void swap(const Matrix& other) noexcept;
+
+        bool is_empty() const;
 
         bool is_square() const;
         bool is_zero() const;
@@ -33,8 +48,29 @@ namespace math::geom {
         value_type get(size_t row, size_t col) const;
         void set(size_t row, size_t col, value_type value);
 
+        ConstProxyVector operator[](size_t row) const;
+        ProxyVector operator[](size_t row);
+
+        void swap_rows(size_t r1, size_t r2);
+        void swap_columns(size_t c1, size_t c2);
+
         value_type det() const;
+
+    private:
+        const value_type& _(size_t row, size_t col) const; //direct access
+        value_type& _(size_t row, size_t col); // Its not an operator() because in methods it is perceived as an operator,
+
+    private:
+        std::array<value_type, Rows * Columns> m_data;
     };
+
+    template <size_t Rows, size_t Columns>
+    void swap(Matrix<Rows, Columns>& m1, Matrix<Rows, Columns>& m2) noexcept;
+
+    template <size_t Rows, size_t Columns>
+    bool operator==(const Matrix<Rows, Columns>& m1, const Matrix<Rows, Columns>& m2);
+    template <size_t Rows, size_t Columns>
+    bool operator!=(const Matrix<Rows, Columns>& m1, const Matrix<Rows, Columns>& m2);
 
     template <size_t Rows, size_t Columns>
     Matrix<Rows, Columns> operator*(const Matrix<Rows, Columns>& matrix, typename Matrix<Rows, Columns>::value_type scalar);
@@ -73,6 +109,64 @@ namespace math::geom {
     using Matrix2x2 = Matrix<2, 2>;
     using Matrix3x3 = Matrix<3, 3>;
     using Matrix4x4 = Matrix<4, 4>;
+
+    template <size_t Rows, size_t Columns>
+    class Matrix<Rows, Columns>::ConstProxyVector {
+    public:
+        using const_iterator = typename std::array<value_type, Columns>::const_iterator;
+
+        const_iterator begin() const;
+        const_iterator end() const;
+
+    public:
+        ConstProxyVector(const_iterator front);
+
+        value_type operator[](size_t col) const;
+
+        size_t size() const;
+        bool empty() const;
+
+        operator Vector<Columns>() const;
+
+    private:
+        const_iterator m_front;
+    };
+
+    template <size_t Rows, size_t Columns>
+    bool operator==(const Matrix<Rows, Columns>::ConstProxyVector& v1, const Matrix<Rows, Columns>::ConstProxyVector& v2);
+    template <size_t Rows, size_t Columns>
+    bool operator!=(const Matrix<Rows, Columns>::ConstProxyVector& v1, const Matrix<Rows, Columns>::ConstProxyVector& v2);
+
+    template <size_t Rows, size_t Columns>
+    class Matrix<Rows, Columns>::ProxyVector {
+    public:
+        using const_iterator = typename std::array<value_type, Columns>::const_iterator;
+        using iterator = typename std::vector<value_type, Columns>::iterator;
+
+        const_iterator begin() const;
+        const_iterator end() const;
+        iterator begin();
+        iterator end();
+
+    public:
+        ProxyVector(iterator front);
+
+        value_type operator[](size_t col) const;
+        value_type& operator[](size_t col);
+
+        size_t size() const;
+        bool empty() const;
+
+        operator Vector<Columns>() const;
+
+    private:
+        iterator m_front;
+    };
+
+    template <size_t Rows, size_t Columns>
+    bool operator==(const Matrix<Rows, Columns>::ProxyVector& v1, const Matrix<Rows, Columns>::ProxyVector& v2);
+    template <size_t Rows, size_t Columns>
+    bool operator!=(const Matrix<Rows, Columns>::ProxyVector& v1, const Matrix<Rows, Columns>::ProxyVector& v2);
 
 } // namespace math::geom
 

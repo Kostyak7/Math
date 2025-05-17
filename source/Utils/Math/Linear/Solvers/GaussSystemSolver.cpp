@@ -81,8 +81,9 @@ math::linal::GaussLinearSystemSolver::GaussLinearSystemSolver(const Params& para
 {
 }
 
-math::linal::DVector math::linal::GaussLinearSystemSolver::solve(const AnyMatrix& matrix, const DVector& rhs, const DVector& /*x0*/) {
-    return std::visit([this, &rhs](const auto& matrix) -> DVector {
+math::linal::DVector math::linal::GaussLinearSystemSolver::solve(const AnyMatrixConstRef& matrix, const DVector& rhs, const DVector& /*x0*/) {
+    return std::visit([&](const auto& matrix_ref) -> DVector {
+        const auto& matrix = matrix_ref.get();
         if (!slae_check(matrix, rhs)) {
             return {};
         }

@@ -12,13 +12,13 @@ namespace math::linal {
 
         ILinearSystemSolver(const Params& params = {});
 
-        virtual DVector solve(const AnyMatrix& matrix, const DVector& rhs, const DVector& x0 = {}) = 0;
+        virtual DVector solve(const AnyMatrixConstRef& matrix, const DVector& rhs, const DVector& x0 = {}) = 0;
         virtual ~ILinearSystemSolver() = default;
 
         Params get_params() const;
 
     protected:
-        virtual bool slae_check(const AnyMatrix& matrix, const DVector& rhs) const;
+        virtual bool slae_check(const IMatrix& matrix, const DVector& rhs) const;
 
     protected:
         Params m_params;

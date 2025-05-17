@@ -44,9 +44,9 @@ namespace math::linal {
             double resid;
         };
 
-        virtual Data init_method(const AnyMatrix& matrix, const DVector& rhs, const DVector& x0);
+        virtual Data init_method(const AnyMatrixConstRef& matrix, const DVector& rhs, const DVector& x0);
 
-        void init_preconditioner(const AnyMatrix& matrix) const;
+        void init_preconditioner(const AnyMatrixConstRef& matrix) const;
         DVector apply_precondition(const DVector& vector) const;
 
         bool check_convergence_criterion(const DVector& residual, double rhs_norm, size_t iteration) const;

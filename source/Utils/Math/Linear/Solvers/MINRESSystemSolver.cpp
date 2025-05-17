@@ -7,22 +7,21 @@ math::linal::MINRESLinearSystemSolver::MINRESLinearSystemSolver(size_t Krylov_su
 {
 }
 
-bool math::linal::MINRESLinearSystemSolver::slae_check(const AnyMatrix& matrix, const DVector& rhs) const {
-    return std::visit([this, &rhs](const auto& matrix) -> bool {
-        if (IKrylovTypeLinearSystemSolver::slae_check(matrix, rhs)) {
-            return true;
-        }
-        if (matrix.is_symmetrical()) {
-            if (m_params.throw_exceptions)
-                throw std::invalid_argument("Matrix of system must be symmetrical");
-            return false;
-        }
-        return true;
-        }, matrix);
+bool math::linal::MINRESLinearSystemSolver::slae_check(const IMatrix& matrix, const DVector& rhs) const {
+    if (IKrylovTypeLinearSystemSolver::slae_check(matrix, rhs))
+        return true; {
+    }
+    if (matrix.is_symmetrical()) {
+        if (m_params.throw_exceptions)
+            throw std::invalid_argument("Matrix of system must be symmetrical");
+        return false;
+    }
+    return true;
 }
 
-math::linal::DVector math::linal::MINRESLinearSystemSolver::solve(const AnyMatrix& matrix, const DVector& rhs, const DVector& x0) {
-    return std::visit([this, &rhs, &x0](const auto& matrix) -> DVector {
+math::linal::DVector math::linal::MINRESLinearSystemSolver::solve(const AnyMatrixConstRef& matrix, const DVector& rhs, const DVector& x0) {
+    return std::visit([&](const auto& matrix_ref) -> DVector {
+        const auto& matrix = matrix_ref.get();
         auto [need_to_solve, x, rhs_norm, r, r_norm, resid] = init_method(matrix, rhs, x0);
         if (!need_to_solve) {
             return x;

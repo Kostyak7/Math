@@ -1,6 +1,6 @@
 #pragma once 
 
-#include "IMatrix.h"
+#include "IMatrixFromVector.h"
 
 namespace math::linal {
 
@@ -8,18 +8,27 @@ namespace math::linal {
      @brief Ленточная матрица особого вида
      @details Симметричная, хранятся только строки начиная с диагонального элемента
     */
-    class BandMatrix final: public IMatrix, 
-                            public std::vector<DVector> {
+    class BandMatrix final: public IMatrixFromVector {
     public:
-        using value_type = IMatrix::value_type;
-        using std::vector<DVector>::vector;
+        BandMatrix() noexcept = default;
+        BandMatrix(size_t size, size_t isl = 1, const value_type& default_value = {});
+        BandMatrix(const BandMatrix& matrix);
+        BandMatrix(BandMatrix&& matrix) noexcept;
+        BandMatrix(std::initializer_list<value_type> list);
+        BandMatrix(std::initializer_list<std::initializer_list<value_type>> list);
 
-    public:
+        BandMatrix& operator=(const BandMatrix& matrix);
+        BandMatrix& operator=(BandMatrix&& matrix) noexcept;
+
         BandMatrix& operator*=(value_type scalar);
         BandMatrix& operator/=(value_type scalar);
 
         BandMatrix& operator+=(const BandMatrix& other);
         BandMatrix& operator-=(const BandMatrix& other);
+
+        void swap(BandMatrix& matrix) noexcept;
+
+        void reshape(size_t size, size_t isl) override;
 
         bool is_zero() const override;
         bool is_identity() const override;
@@ -45,8 +54,20 @@ namespace math::linal {
         std::vector<std::pair<complex_value_type, std::vector<DVector>>> get_eigenvectors() const override;
 
         static BandMatrix identity_matrix(size_t n, size_t isl = 1);
-        static BandMatrix elementary_matrix_unit(size_t n, size_t i, size_t j, double value = 1.0);
+        static BandMatrix elementary_matrix_unit(size_t n, size_t i, size_t j, value_type value = 1.0);
+
+    private:
+        ConstProxyVector get_row(size_t row) const override;
+        ProxyVector get_row(size_t row) override;
+        bool check_row_index(size_t row) const override;
+        size_t calculate_index(size_t row, size_t col) const override;
+
+    private:
+        size_t m_size;
+        size_t m_isl;
     };
+
+    void swap(BandMatrix& m1, BandMatrix& m2) noexcept;
 
     bool operator==(const BandMatrix& m1, const BandMatrix& m2);
     bool operator!=(const BandMatrix& m1, const BandMatrix& m2);

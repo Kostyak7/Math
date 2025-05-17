@@ -17,6 +17,9 @@ namespace math::linal {
         virtual bool is_equal(const IMatrix& other) const;
         virtual bool is_empty() const;
 
+        virtual void reshape(size_t height, size_t width) = 0;
+        virtual void clear() = 0;
+
         virtual bool is_square() const;
         virtual bool is_zero() const;
         virtual bool is_identity() const;

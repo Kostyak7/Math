@@ -89,7 +89,7 @@ math::geom::Vector3D math::geom::rotate_z(const Vector3D& vec, double angle) {
 math::geom::Point2D math::geom::rotate_around(const Point2D& p, const Point2D& center, double angle) {
 	Vector2D rel = p - center;
 	Vector2D rotated = rotate_2d(rel, angle);
-	return center + rotated;
+	return center + rotated.get_end_point();
 }
 
 math::geom::Point3D math::geom::rotate_around_axis(const Point3D& p, const Vector3D& axis, double angle) {
@@ -98,7 +98,7 @@ math::geom::Point3D math::geom::rotate_around_axis(const Point3D& p, const Vecto
 	double sinA = std::sin(angle);
 
 	Vector3D v = p;
-	return u * (u.dot(v)) * (1 - cosA) + v * cosA + cross_product(u, v) * sinA;
+	return (u * (u.dot(v)) * (1 - cosA) + v * cosA + cross_product(u, v) * sinA).get_end_point();
 }
 
 math::geom::Point2D math::geom::project(const Point2D& point, const Line2D& line) {
@@ -107,7 +107,7 @@ math::geom::Point2D math::geom::project(const Point2D& point, const Line2D& line
 		return point;
 	Vector2D ap(line.p1, point);
 	double t = ap.dot(ab) / ab.dot(ab);
-	return line.p1 + ab * t;
+	return line.p1 + ab.get_end_point() * t;
 }
 
 math::geom::Matrix4x4 math::geom::orthographic_projection(double left, double right, double bottom, double top, double near, double far) {
@@ -197,7 +197,7 @@ double math::geom::signed_angle_2d(const Vector2D& v1, const Vector2D& v2) {
 }
 
 math::geom::Matrix4x4 math::geom::look_at(const Point3D& eye, const Point3D& target, const Vector3D& up) {
-	Vector3D f = normalized(target - eye);
+	Vector3D f = normalized(Vector3D{ target - eye });
 	Vector3D r = normalized(cross_product(f, up));
 	Vector3D u = cross_product(r, f);
 
@@ -214,7 +214,10 @@ double math::geom::triangle_area(const Point2D& a, const Point2D& b, const Point
 }
 
 double math::geom::tetrahedron_volume(const Point3D& p1, const Point3D& p2, const Point3D& p3, const Point3D& p4) {
-	return (p2 - p1).dot(cross_product(p3 - p1, p4 - p1)) / 6.0;
+	Vector3D v1 = p2 - p1;
+	Vector3D v2 = p3 - p1;
+	Vector3D v3 = p4 - p1;
+	return v1.dot(cross_product(v2, v3)) / 6.0;
 }
 
 double math::geom::orientation_2d(const Point2D& a, const Point2D& b, const Point2D& c) {

@@ -58,12 +58,12 @@ namespace {
 
 } // namespace
 
-void math::linal::JacobiPreconditioner::init(const AnyMatrix& matrix) {
-    if (std::holds_alternative<BandMatrix>(matrix)) {
-        m_impl = std::make_unique<BandImpl>(std::get<BandMatrix>(matrix));
+void math::linal::JacobiPreconditioner::init(const AnyMatrixConstRef& matrix) {
+    if (std::holds_alternative<std::reference_wrapper<const BandMatrix>>(matrix)) {
+        m_impl = std::make_unique<BandImpl>(std::get<std::reference_wrapper<const BandMatrix>>(matrix).get());
     }
-    else if (std::holds_alternative<DenseMatrix>(matrix)) {
-        m_impl = std::make_unique<DenseImpl>(std::get<DenseMatrix>(matrix));
+    else if (std::holds_alternative<std::reference_wrapper<const DenseMatrix>>(matrix)) {
+        m_impl = std::make_unique<DenseImpl>(std::get<std::reference_wrapper<const DenseMatrix>>(matrix).get());
     }
     else {
         throw std::runtime_error("Unsupported matrix type for Jacobi preconditioner");

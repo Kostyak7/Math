@@ -123,10 +123,10 @@ template <class TMatrix>
 void tests::SolverTester<TMatrix>::print_test_result(const TestResult& res) const {
 	if (m_params.print_slae) {
 		std::cout << "A = \n";
-		print_matrix(m_slaes[res.index].A);
+		//print_matrix(m_slaes[res.index].A);
 
 		std::cout << "\nb = ";
-		print_vector(m_slaes[res.index].b);
+		//print_vector(m_slaes[res.index].b);
 
 		if (m_slaes[res.index].solution.size()) {
 			std::cout << "\n\ns = ";
@@ -227,9 +227,14 @@ namespace tests {
 			}
 			SLAE<math::linal::BandMatrix> slae;
 			for (int i = 0; i < n; ++i) {
-				slae.A.resize(n);
-				for (auto& row : slae.A) {
-					row = get_random_vector(isl, sparsity);
+				slae.A.reshape(n, isl);
+				for (size_t r = 0; r < n; ++r) {
+					for (auto& el : slae.A[r]) {
+						if (sparsity > 0 || sparsity_dist(gen) > sparsity) {
+							el = get_random_double();
+						}
+					}
+					slae.A[r].at(0) = get_random_ranged_double(-1000., 1000., false);
 				}
 			}
 			sparsity = 0.0;
@@ -252,9 +257,14 @@ namespace tests {
 		SLAE<math::linal::DenseMatrix> get_SLAE(size_t n, double sparsity = 0.5) {
 			SLAE<math::linal::DenseMatrix> slae;
 			for (int i = 0; i < n; ++i) {
-				slae.A.resize(n);
-				for (auto& row : slae.A) {
-					row = get_random_vector(n, sparsity);
+				slae.A.reshape(n, n);
+				for (size_t r = 0; r < n; ++r) {
+					for (auto& el : slae.A[r]) {
+						if (sparsity > 0 || sparsity_dist(gen) > sparsity) {
+							el = get_random_double();
+						}
+					}
+					slae.A[r].at(0) = get_random_ranged_double(-1000., 1000., false);
 				}
 			}
 			sparsity = 0.0;

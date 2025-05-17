@@ -152,8 +152,11 @@ namespace {
     };
 
     class DenseImpl : public math::linal::ILUPreconditioner::Impl {
+        using Matrix = math::linal::DenseMatrix;
+        using Vector = math::linal::DVector;
+
     public:
-        DenseImpl(const math::linal::DenseMatrix& matrix) {
+        DenseImpl(const Matrix& matrix) {
             // ...
         }
 
@@ -162,8 +165,11 @@ namespace {
     };
 
     class SparseImpl : public math::linal::ILUPreconditioner::Impl {
+        using Matrix = math::linal::SparseMatrix;
+        using Vector = math::linal::DVector;
+
     public:
-        SparseImpl(const math::linal::SparseMatrix& matrix) {
+        SparseImpl(const Matrix& matrix) {
             // ...
         }
 
@@ -173,15 +179,15 @@ namespace {
 
 } // namespace
 
-void math::linal::ILUPreconditioner::init(const AnyMatrix& matrix) {
-    if (std::holds_alternative<BandMatrix>(matrix)) {
-        m_impl = std::make_unique<BandImpl>(std::get<BandMatrix>(matrix));
+void math::linal::ILUPreconditioner::init(const AnyMatrixConstRef& matrix) {
+    if (std::holds_alternative<std::reference_wrapper<const BandMatrix>>(matrix)) {
+        m_impl = std::make_unique<BandImpl>(std::get<std::reference_wrapper<const BandMatrix>>(matrix).get());
     } 
-    else if (std::holds_alternative<DenseMatrix>(matrix)) {
-        m_impl = std::make_unique<DenseImpl>(std::get<DenseMatrix>(matrix));
+    else if (std::holds_alternative<std::reference_wrapper<const DenseMatrix>>(matrix)) {
+        m_impl = std::make_unique<DenseImpl>(std::get<std::reference_wrapper<const DenseMatrix>>(matrix).get());
     }
-    else if (std::holds_alternative<SparseMatrix>(matrix)) {
-        m_impl = std::make_unique<SparseImpl>(std::get<SparseMatrix>(matrix));
+    else if (std::holds_alternative<std::reference_wrapper<const SparseMatrix>>(matrix)) {
+        m_impl = std::make_unique<SparseImpl>(std::get<std::reference_wrapper<const SparseMatrix>>(matrix).get());
     }    
     else {
         throw std::runtime_error("Unsupported matrix type for ILU preconditioner");

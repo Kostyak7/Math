@@ -7,20 +7,20 @@
 #include <Utils/Math/Common.h>
 
 namespace math::geom {
-        
+
     Matrix2x2 rotation_matrix_2d(double angle_rad);
     Matrix3x3 rotation_matrix_x(double angle_rad);
     Matrix3x3 rotation_matrix_y(double angle_rad);
     Matrix3x3 rotation_matrix_z(double angle_rad);
-    
+
     Vector2D rotate_2d(const Vector2D& vec, double angle);
-	Vector3D rotate_x(const Vector3D& vec, double angle);
+    Vector3D rotate_x(const Vector3D& vec, double angle);
     Vector3D rotate_y(const Vector3D& vec, double angle);
     Vector3D rotate_z(const Vector3D& vec, double angle);
 
     Point2D rotate_around(const Point2D& p, const Point2D& center, double angle);
     Point3D rotate_around_axis(const Point3D& p, const Vector3D& axis, double angle);
-	
+
     Point2D project(const Point2D& point, const Line2D& line);
 
     template <size_t N>

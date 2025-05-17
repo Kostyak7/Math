@@ -4,6 +4,7 @@
 
 namespace math::geom {
 
+    template <size_t N>
     class Polygon {
     public:
         using value_type = typename Point<N>::value_type;
@@ -39,7 +40,7 @@ namespace math::geom {
         }
 
     private:
-        std::vector<Point3D> m_points;
+        std::vector<Point<N>> m_points;
     };
 
     using Polygon2D = Polygon<2>;

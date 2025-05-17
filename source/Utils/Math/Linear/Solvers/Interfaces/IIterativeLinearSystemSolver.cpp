@@ -15,8 +15,9 @@ math::linal::IIterativeLinearSystemSolver::SolutionStats math::linal::IIterative
     return m_solution_stats;
 }
 
-math::linal::IIterativeLinearSystemSolver::Data math::linal::IIterativeLinearSystemSolver::init_method(const AnyMatrix& matrix, const DVector& rhs, const DVector& x0) {
-    return std::visit([this, &rhs, &x0](const auto& matrix) -> Data {
+math::linal::IIterativeLinearSystemSolver::Data math::linal::IIterativeLinearSystemSolver::init_method(const AnyMatrixConstRef& matrix, const DVector& rhs, const DVector& x0) {
+    return std::visit([&](const auto& matrix_ref) -> Data {
+        const auto& matrix = matrix_ref.get();
         Data res{ false, {}, 0.0, {}, 0.0, 0.0 };
         if (!slae_check(matrix, rhs)) {
             return res;
@@ -53,7 +54,7 @@ math::linal::IIterativeLinearSystemSolver::Data math::linal::IIterativeLinearSys
         }, matrix);
 }
 
-void math::linal::IIterativeLinearSystemSolver::init_preconditioner(const AnyMatrix& matrix) const {
+void math::linal::IIterativeLinearSystemSolver::init_preconditioner(const AnyMatrixConstRef& matrix) const {
     if (m_preconditioner) {
         m_preconditioner->init(matrix);
     }

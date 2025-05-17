@@ -9,7 +9,7 @@ namespace math::linal {
     class IPreconditioner {
     public:
         virtual ~IPreconditioner() = default;
-        virtual void init(const AnyMatrix& matrix) = 0;
+        virtual void init(const AnyMatrixConstRef& matrix) = 0;
 
         DVector apply(const DVector& x) const { // по дефолту это только левое предобуславливание
             return m_impl->apply(x);

@@ -10,7 +10,7 @@ namespace math::linal {
                                    const IterativeSolvingParams& iter_params = {}, 
                                    const Params& params = {}, 
                                    std::unique_ptr<IPreconditioner> preconditioner = nullptr);
-        DVector solve(const AnyMatrix& matrix, const DVector& rhs, const DVector& x0 = {}) override;
+        DVector solve(const AnyMatrixConstRef& matrix, const DVector& rhs, const DVector& x0 = {}) override;
     };
 
 } // namespace math::linal

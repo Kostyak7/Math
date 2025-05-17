@@ -39,7 +39,7 @@ namespace math::linal {
         };
 
         explicit MGPreconditioner(const Params& params = {});
-        void init(const AnyMatrix& matrix) override;
+        void init(const AnyMatrixConstRef& matrix) override;
 
         class Impl;
 

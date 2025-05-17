@@ -33,7 +33,9 @@ math::linal::SparseMatrix& math::linal::SparseMatrix::operator=(const SparseMatr
 math::linal::SparseMatrix& math::linal::SparseMatrix::operator=(SparseMatrix&& other) {
     if (this == &other) 
         return *this;
-    swap(other);
+    m_data = std::move(other.m_data);
+    m_width = other.m_width;
+    m_height = other.m_height;
     return *this;
 
 }
@@ -85,6 +87,31 @@ math::linal::SparseMatrix& math::linal::SparseMatrix::operator-=(const SparseMat
         }
     }
     return *this;
+}
+
+void math::linal::SparseMatrix::swap(SparseMatrix& other) noexcept {
+    std::swap(m_width, other.m_width);
+    std::swap(m_height, other.m_height);
+    std::swap(m_data, other.m_data);
+}
+
+void math::linal::SparseMatrix::reshape(size_t height, size_t width) {
+    for (auto it = m_data.begin(); it != m_data.end(); ) {
+        const auto& [i, j] = it->first;
+        if (i >= height || j >= width) {
+            it = m_data.erase(it);  
+        }
+        else {
+            ++it;
+        }
+    }
+
+    m_height = height;
+    m_width = width;
+}
+
+void math::linal::SparseMatrix::clear() {
+    m_data.clear();
 }
 
 bool math::linal::SparseMatrix::is_zero() const {
@@ -235,12 +262,6 @@ math::linal::SparseMatrix math::linal::SparseMatrix::elementary_matrix_unit(size
     SparseMatrix res(n, m);
     res.set(i, j, value);
     return res;
-}
-
-void math::linal::SparseMatrix::swap(SparseMatrix& other) noexcept {
-    std::swap(m_width, other.m_width);
-    std::swap(m_height, other.m_height);
-    std::swap(m_data, other.m_data);
 }
 
 void math::linal::swap(SparseMatrix& m1, SparseMatrix& m2) noexcept {

@@ -1,0 +1,16 @@
+Solver: MINRES+MG
+time: 
+241.729, 	
+
+Solver: CG+MG
+time: 
+405.066, 	
+
+Solver: FGMRES+MG
+time: 
+294.373, 	
+
+Solver: GMRES+MG
+time: 
+587.861, 	
+

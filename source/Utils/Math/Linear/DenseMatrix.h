@@ -1,25 +1,33 @@
 #pragma once 
 
-#include "IMatrix.h"
+#include "IMatrixFromVector.h"
 
 namespace math::linal {
 
     /**
      @brief Обычная плотная матрица 
     */
-    class DenseMatrix final: public IMatrix,
-                             public std::vector<DVector> {
+    class DenseMatrix final: public IMatrixFromVector {
     public:
-        using value_type = IMatrix::value_type;
-        using std::vector<DVector>::vector;
+        DenseMatrix() noexcept = default;
         DenseMatrix(size_t height, size_t width, const value_type& default_value = {});
+        DenseMatrix(const DenseMatrix& matrix);
+        DenseMatrix(DenseMatrix&& matrix) noexcept;
+        DenseMatrix(std::initializer_list<value_type> list);
+        DenseMatrix(std::initializer_list<std::initializer_list<value_type>> list);
 
-    public:
+        DenseMatrix& operator=(const DenseMatrix& matrix);
+        DenseMatrix& operator=(DenseMatrix&& matrix) noexcept;
+
         DenseMatrix& operator*=(value_type scalar);
         DenseMatrix& operator/=(value_type scalar);
 
         DenseMatrix& operator+=(const DenseMatrix& other);
         DenseMatrix& operator-=(const DenseMatrix& other);     
+
+        void swap(DenseMatrix& matrix) noexcept;
+
+        void reshape(size_t height, size_t width) override;
 
         bool is_positive_definite() const override;
 
@@ -34,9 +42,24 @@ namespace math::linal {
         std::vector<std::pair<size_t, complex_value_type>> get_eigenvalues() const override;
         std::vector<std::pair<complex_value_type, std::vector<DVector>>> get_eigenvectors() const override;
 
+        void swap_rows(size_t r1, size_t r2);
+        void swap_columns(size_t c1, size_t c2);
+
         static DenseMatrix identity_matrix(size_t n);
         static DenseMatrix elementary_matrix_unit(size_t n, size_t m, size_t i, size_t j, double value = 1.0);
+
+    private:
+        ConstProxyVector get_row(size_t row) const override;
+        ProxyVector get_row(size_t row) override;
+        bool check_row_index(size_t row) const override;
+        size_t calculate_index(size_t row, size_t col) const override;
+
+    private:
+        size_t m_height;
+        size_t m_width;
     };
+
+    void swap(DenseMatrix& m1, DenseMatrix& m2) noexcept;
 
     bool operator==(const DenseMatrix& m1, const DenseMatrix& m2);
     bool operator!=(const DenseMatrix& m1, const DenseMatrix& m2);
