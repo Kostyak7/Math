@@ -180,7 +180,7 @@ namespace tests {
 		SolverTester<TMatrix>::Params params = { true, true, true, false, false, false };
 
 		std::vector<std::shared_ptr<SolverTester<TMatrix>>> testers{
-			create_solver_tester(slaes, SolverFactory::SolverName::Gauss,    SolverFactory::PredictionerName::None, params), // +
+			//create_solver_tester(slaes, SolverFactory::SolverName::Gauss,    SolverFactory::PredictionerName::None, params), // +
 			//create_solver_tester(slaes, SolverFactory::SolverName::BiCGSTAB, SolverFactory::PredictionerName::None, params), // +
 			//create_solver_tester(slaes, SolverFactory::SolverName::CG,       SolverFactory::PredictionerName::None, params), // +
 			//create_solver_tester(slaes, SolverFactory::SolverName::FGMRES,   SolverFactory::PredictionerName::None, params), // +
@@ -190,15 +190,15 @@ namespace tests {
 			//// Пока возможно только левое предобуславлвивание 
 			//// BiCGSTAB, СG, MINRES чувствительны к этому и Jacobi для них не подходит
 			//// Для совместимости с BiCGSTAB (MINRES?) нужно реализовать двустороннее предобуславливание
-			//create_solver_tester(slaes, SolverFactory::SolverName::FGMRES,   SolverFactory::PredictionerName::JACOBI, params), // +
-			//create_solver_tester(slaes, SolverFactory::SolverName::GMRES,    SolverFactory::PredictionerName::JACOBI, params), // +
+			create_solver_tester(slaes, SolverFactory::SolverName::FGMRES,   SolverFactory::PredictionerName::JACOBI, params), // +
+			create_solver_tester(slaes, SolverFactory::SolverName::GMRES,    SolverFactory::PredictionerName::JACOBI, params), // +
 			// 
 			//// CG очень чувствителен к предобуславливанию, он требует симметричности
 			//// MINRES требует положительно определенного предобуславливателя
-			//create_solver_tester(slaes, SolverFactory::SolverName::BiCGSTAB, SolverFactory::PredictionerName::ILU, params), // +
-			//create_solver_tester(slaes, SolverFactory::SolverName::CG,	   SolverFactory::PredictionerName::ILU, params), // +
-			//create_solver_tester(slaes, SolverFactory::SolverName::FGMRES,   SolverFactory::PredictionerName::ILU, params), // +
-			//create_solver_tester(slaes, SolverFactory::SolverName::GMRES,    SolverFactory::PredictionerName::ILU, params), // +
+			create_solver_tester(slaes, SolverFactory::SolverName::BiCGSTAB, SolverFactory::PredictionerName::ILU, params), // +
+			create_solver_tester(slaes, SolverFactory::SolverName::CG,	   SolverFactory::PredictionerName::ILU, params), // +
+			create_solver_tester(slaes, SolverFactory::SolverName::FGMRES,   SolverFactory::PredictionerName::ILU, params), // +
+			create_solver_tester(slaes, SolverFactory::SolverName::GMRES,    SolverFactory::PredictionerName::ILU, params), // +
 			// 
 			//create_solver_tester(slaes, SolverFactory::SolverName::BiCGSTAB, SolverFactory::PredictionerName::MG, params), // +
 			//create_solver_tester(slaes, SolverFactory::SolverName::CG,       SolverFactory::PredictionerName::MG, params), // +
@@ -222,21 +222,21 @@ namespace tests {
 		SolverTester<TMatrix>::Params params = { true, true, true, false, false, false };
 
 		std::vector<std::shared_ptr<SolverTester<TMatrix>>> testers{
-			//create_solver_tester(slaes, SolverFactory::SolverName::Gauss,    SolverFactory::PredictionerName::None, params), // +
-			//create_solver_tester(slaes, SolverFactory::SolverName::BiCGSTAB, SolverFactory::PredictionerName::None, params), // +
-			//create_solver_tester(slaes, SolverFactory::SolverName::CG,       SolverFactory::PredictionerName::None, params), // +
-			//create_solver_tester(slaes, SolverFactory::SolverName::FGMRES,   SolverFactory::PredictionerName::None, params), // +
-			//create_solver_tester(slaes, SolverFactory::SolverName::GMRES,    SolverFactory::PredictionerName::None, params), // +
-			//create_solver_tester(slaes, SolverFactory::SolverName::MINRES,   SolverFactory::PredictionerName::None, params), // +
-			// 
-			//create_solver_tester(slaes, SolverFactory::SolverName::FGMRES,   SolverFactory::PredictionerName::JACOBI, params), // +
-			//create_solver_tester(slaes, SolverFactory::SolverName::GMRES,    SolverFactory::PredictionerName::JACOBI, params), // +
-			// 
-			//create_solver_tester(slaes, SolverFactory::SolverName::BiCGSTAB, SolverFactory::PredictionerName::ILU, params), // +
-			//create_solver_tester(slaes, SolverFactory::SolverName::CG,	     SolverFactory::PredictionerName::ILU, params), // +
-			//create_solver_tester(slaes, SolverFactory::SolverName::FGMRES,   SolverFactory::PredictionerName::ILU, params), // +
-			//create_solver_tester(slaes, SolverFactory::SolverName::GMRES,    SolverFactory::PredictionerName::ILU, params), // +
-			// 
+			create_solver_tester(slaes, SolverFactory::SolverName::Gauss,    SolverFactory::PredictionerName::None, params), // +
+			create_solver_tester(slaes, SolverFactory::SolverName::BiCGSTAB, SolverFactory::PredictionerName::None, params), // +
+			create_solver_tester(slaes, SolverFactory::SolverName::CG,       SolverFactory::PredictionerName::None, params), // +
+			create_solver_tester(slaes, SolverFactory::SolverName::FGMRES,   SolverFactory::PredictionerName::None, params), // +
+			create_solver_tester(slaes, SolverFactory::SolverName::GMRES,    SolverFactory::PredictionerName::None, params), // +
+			create_solver_tester(slaes, SolverFactory::SolverName::MINRES,   SolverFactory::PredictionerName::None, params), // +
+			 
+			create_solver_tester(slaes, SolverFactory::SolverName::FGMRES,   SolverFactory::PredictionerName::JACOBI, params), // +
+			create_solver_tester(slaes, SolverFactory::SolverName::GMRES,    SolverFactory::PredictionerName::JACOBI, params), // +
+			 
+			create_solver_tester(slaes, SolverFactory::SolverName::BiCGSTAB, SolverFactory::PredictionerName::ILU, params), // +
+			create_solver_tester(slaes, SolverFactory::SolverName::CG,	     SolverFactory::PredictionerName::ILU, params), // +
+			create_solver_tester(slaes, SolverFactory::SolverName::FGMRES,   SolverFactory::PredictionerName::ILU, params), // +
+			create_solver_tester(slaes, SolverFactory::SolverName::GMRES,    SolverFactory::PredictionerName::ILU, params), // +
+			 
 			create_solver_tester(slaes, SolverFactory::SolverName::BiCGSTAB, SolverFactory::PredictionerName::MG, params), // +
 			create_solver_tester(slaes, SolverFactory::SolverName::CG,       SolverFactory::PredictionerName::MG, params), // +
 			create_solver_tester(slaes, SolverFactory::SolverName::FGMRES,   SolverFactory::PredictionerName::MG, params), // +
@@ -369,9 +369,9 @@ namespace tests {
 
 	inline void run_linear_tests() {
 
-		tests::base_tests<math::linal::BandMatrix>();
+		//tests::base_tests<math::linal::BandMatrix>();
 
-		//tests::one_random_test<math::linal::BandMatrix>();
+		tests::one_random_test<math::linal::BandMatrix>();
 
 		//tests::diff_sizes_test<math::linal::BandMatrix>();
 

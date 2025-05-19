@@ -22,10 +22,10 @@ namespace math::linal {
         SparseMatrix() noexcept = default;
         SparseMatrix(size_t width, size_t height);
         SparseMatrix(const SparseMatrix& matrix);
-        SparseMatrix(SparseMatrix&& matrix);
+        SparseMatrix(SparseMatrix&& matrix) noexcept;
 
         SparseMatrix& operator=(const SparseMatrix& other);
-        SparseMatrix& operator=(SparseMatrix&& other);
+        SparseMatrix& operator=(SparseMatrix&& other) noexcept;
 
         SparseMatrix& operator*=(value_type scalar);
         SparseMatrix& operator/=(value_type scalar);

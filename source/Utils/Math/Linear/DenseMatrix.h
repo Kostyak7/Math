@@ -9,7 +9,7 @@ namespace math::linal {
     */
     class DenseMatrix final: public IMatrixFromVector {
     public:
-        DenseMatrix() noexcept = default;
+        DenseMatrix() noexcept;
         DenseMatrix(size_t height, size_t width, const value_type& default_value = {});
         DenseMatrix(const DenseMatrix& matrix);
         DenseMatrix(DenseMatrix&& matrix) noexcept;

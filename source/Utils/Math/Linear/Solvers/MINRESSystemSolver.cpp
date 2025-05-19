@@ -22,7 +22,7 @@ bool math::linal::MINRESLinearSystemSolver::slae_check(const IMatrix& matrix, co
 math::linal::DVector math::linal::MINRESLinearSystemSolver::solve(const AnyMatrixConstRef& matrix, const DVector& rhs, const DVector& x0) {
     return std::visit([&](const auto& matrix_ref) -> DVector {
         const auto& matrix = matrix_ref.get();
-        auto [need_to_solve, x, rhs_norm, r, r_norm, resid] = init_method(matrix, rhs, x0);
+        auto [need_to_solve, x, rhs_norm, r, r_norm, resid] = init_method(matrix_ref, rhs, x0);
         if (!need_to_solve) {
             return x;
         }

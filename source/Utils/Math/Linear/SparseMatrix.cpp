@@ -17,8 +17,11 @@ math::linal::SparseMatrix::SparseMatrix(const SparseMatrix& matrix)
 {
 }
 
-math::linal::SparseMatrix::SparseMatrix(SparseMatrix&& matrix) {
-    swap(matrix);
+math::linal::SparseMatrix::SparseMatrix(SparseMatrix&& matrix) noexcept
+    : m_width(matrix.m_width)
+    , m_height(matrix.m_height)
+    , m_data(std::move(matrix.m_data))
+{
 }
 
 math::linal::SparseMatrix& math::linal::SparseMatrix::operator=(const SparseMatrix& other) {
@@ -30,7 +33,7 @@ math::linal::SparseMatrix& math::linal::SparseMatrix::operator=(const SparseMatr
     return *this;
 }
 
-math::linal::SparseMatrix& math::linal::SparseMatrix::operator=(SparseMatrix&& other) {
+math::linal::SparseMatrix& math::linal::SparseMatrix::operator=(SparseMatrix&& other) noexcept {
     if (this == &other) 
         return *this;
     m_data = std::move(other.m_data);

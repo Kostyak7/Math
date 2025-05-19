@@ -47,7 +47,7 @@ math::linal::IIterativeLinearSystemSolver::Data math::linal::IIterativeLinearSys
             return res;
         }
 
-        init_preconditioner(matrix);
+        init_preconditioner(matrix_ref);
 
         res.need_to_solve = true;
         return res;

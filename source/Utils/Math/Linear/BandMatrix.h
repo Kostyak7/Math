@@ -10,7 +10,7 @@ namespace math::linal {
     */
     class BandMatrix final: public IMatrixFromVector {
     public:
-        BandMatrix() noexcept = default;
+        BandMatrix() noexcept;
         BandMatrix(size_t size, size_t isl = 1, const value_type& default_value = {});
         BandMatrix(const BandMatrix& matrix);
         BandMatrix(BandMatrix&& matrix) noexcept;
@@ -63,8 +63,8 @@ namespace math::linal {
         size_t calculate_index(size_t row, size_t col) const override;
 
     private:
-        size_t m_size;
-        size_t m_isl;
+        size_t m_size = 0;
+        size_t m_isl = 0;
     };
 
     void swap(BandMatrix& m1, BandMatrix& m2) noexcept;

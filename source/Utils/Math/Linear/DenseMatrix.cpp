@@ -4,6 +4,13 @@
 
 #include <stdexcept>
 
+math::linal::DenseMatrix::DenseMatrix() noexcept
+    : IMatrixFromVector()
+    , m_height(0)
+    , m_width(0)
+{
+}
+
 math::linal::DenseMatrix::DenseMatrix(size_t height, size_t width, const value_type& default_value)
     : IMatrixFromVector(height * width, default_value)
     , m_height(height)
@@ -20,10 +27,10 @@ math::linal::DenseMatrix::DenseMatrix(const DenseMatrix& matrix)
 }
 
 math::linal::DenseMatrix::DenseMatrix(DenseMatrix&& matrix) noexcept
-    : m_height(matrix.m_height)
+    : IMatrixFromVector(std::move(matrix.m_data))
+    , m_height(matrix.m_height)
     , m_width(matrix.m_width)
 {
-    m_data = std::move(matrix.m_data);
 }
 
 math::linal::DenseMatrix::DenseMatrix(std::initializer_list<value_type> list) 
@@ -31,7 +38,10 @@ math::linal::DenseMatrix::DenseMatrix(std::initializer_list<value_type> list)
     , m_height(list.size())
     , m_width(1)
 {
-    // ...
+    auto it = list.begin();
+    for (size_t i = 0; i < m_height; ++i, ++it) {
+        _(i, 0) = *it;
+    }
 }
 
 math::linal::DenseMatrix::DenseMatrix(std::initializer_list<std::initializer_list<value_type>> list) 
@@ -39,7 +49,23 @@ math::linal::DenseMatrix::DenseMatrix(std::initializer_list<std::initializer_lis
     , m_height(list.size())
     , m_width(list.begin()->size())
 {
-    // ...
+    size_t width = 0;
+    for (const auto& lst : list) {
+        width = std::max(width, lst.size());
+    }
+    if (width != m_width) {
+        reshape(m_height, width);
+    }
+
+    auto it = list.begin();
+    for (size_t r = 0; r < m_height; ++r, ++it) {
+        size_t c = 0;
+        for (const auto& el : *it) {
+            _(r, c) = el;
+            ++c;
+            m_data;
+        }
+    }
 }
 
 math::linal::DenseMatrix& math::linal::DenseMatrix::operator=(const DenseMatrix& matrix) {

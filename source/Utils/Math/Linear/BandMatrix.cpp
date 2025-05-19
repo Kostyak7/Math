@@ -4,6 +4,12 @@
 
 #include <stdexcept>
 
+math::linal::BandMatrix::BandMatrix() noexcept
+    : IMatrixFromVector()
+    , m_size(0)
+    , m_isl(0)
+{
+}
 
 math::linal::BandMatrix::BandMatrix(size_t size, size_t isl, const value_type& default_value)
     : IMatrixFromVector(size* isl, default_value)
@@ -21,10 +27,10 @@ math::linal::BandMatrix::BandMatrix(const BandMatrix& matrix)
 }
 
 math::linal::BandMatrix::BandMatrix(BandMatrix&& matrix) noexcept
-    : m_size(matrix.m_size)
+    : IMatrixFromVector(std::move(matrix.m_data))
+    , m_size(matrix.m_size)
     , m_isl(matrix.m_isl)
 {
-    m_data = std::move(matrix.m_data);
 }
 
 math::linal::BandMatrix::BandMatrix(std::initializer_list<value_type> list)
@@ -32,15 +38,32 @@ math::linal::BandMatrix::BandMatrix(std::initializer_list<value_type> list)
     , m_size(list.size())
     , m_isl(1)
 {
-    // ...
+    auto it = list.begin();
+    for (size_t i = 0; i < m_size; ++i, ++it) {
+        _(i, 0) = *it;
+    }
 }
 
 math::linal::BandMatrix::BandMatrix(std::initializer_list<std::initializer_list<value_type>> list)
-    : IMatrixFromVector(list.size()* list.begin()->size())
+    : IMatrixFromVector(list.size() * list.begin()->size())
     , m_size(list.size())
     , m_isl(list.begin()->size())
 {
-    // ...
+    size_t isl = 0;
+    for (const auto& lst : list) {
+        isl = std::max(isl, lst.size());
+    }
+    if (isl != m_isl) {
+        reshape(m_size, isl);
+    }
+
+    auto rows_it = list.begin();
+    for (size_t r = 0; r < m_size; ++r, ++rows_it) {
+        auto it = rows_it->begin();
+        for (size_t c = 0; c < std::min(m_isl, rows_it->size()); ++c, ++it) {
+            _(r, c) = *it;
+        }        
+    }
 }
 
 math::linal::BandMatrix& math::linal::BandMatrix::operator=(const BandMatrix& matrix) {
@@ -173,7 +196,7 @@ math::linal::BandMatrix::value_type math::linal::BandMatrix::get(size_t row, siz
     if (col < row) {
         return _(col, row - col);
     }
-    return _(col, col - row);
+    return _(row, col - row);
 }
 
 void math::linal::BandMatrix::set(size_t row, size_t col, value_type value) {
@@ -189,7 +212,7 @@ void math::linal::BandMatrix::set(size_t row, size_t col, value_type value) {
     if (col < row) {
         _(col, row - col) = value;
     }
-    _(col, col - row) = value;
+    _(row, col - row) = value;
 }
 
 size_t math::linal::BandMatrix::get_width() const {
@@ -402,7 +425,7 @@ math::linal::BandMatrix math::linal::operator-(const BandMatrix& m1, const BandM
 }
 
 math::linal::BandMatrix math::linal::operator-(const BandMatrix& matrix) {
-    return -1 * matrix;
+    return -1. * matrix;
 }
 
 math::linal::BandMatrix math::linal::inversed(const BandMatrix& matrix) {

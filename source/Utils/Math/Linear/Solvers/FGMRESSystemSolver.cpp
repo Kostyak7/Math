@@ -10,7 +10,7 @@ math::linal::FGMRESLinearSystemSolver::FGMRESLinearSystemSolver(size_t Krylov_su
 math::linal::DVector math::linal::FGMRESLinearSystemSolver::solve(const AnyMatrixConstRef& matrix, const DVector& rhs, const DVector& x0) {
     return std::visit([&](const auto& matrix_ref) -> DVector {
         const auto& matrix = matrix_ref.get();
-        auto [need_to_solve, x, rhs_norm, r, beta, resid] = init_method(matrix, rhs, x0);
+        auto [need_to_solve, x, rhs_norm, r, beta, resid] = init_method(matrix_ref, rhs, x0);
         if (!need_to_solve) {
             return x;
         }
