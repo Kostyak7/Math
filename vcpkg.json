@@ -1,9 +1,11 @@
 {
+  "name": "utils",
+  "version-string": "0.1",
   "dependencies": [
-    "gtest"
+    "nlohmann-json", 
+	  "gtest"
   ],
-  "builtin-baseline": "f523208df4ae467436dc2d2eeab594fed240d552",
-
+  "builtin-baseline": "3f6e8e9c09e28a0eae4b37cceb2982ca2518278c",
   "overrides": [
     
     {
