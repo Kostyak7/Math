@@ -6,7 +6,7 @@
 
 namespace math::linal {
 
-    class IMatrix {
+    class MATH_EXPORT IMatrix {
     public:
         using value_type = double;
         using complex_value_type = std::complex<value_type>;

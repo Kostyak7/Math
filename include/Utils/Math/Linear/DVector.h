@@ -1,10 +1,11 @@
 #pragma once 
 
+#include "math_export.hpp"
 #include <vector>
 
 namespace math::linal {
 
-	class DVector : public std::vector<double> {
+	class MATH_EXPORT DVector : public std::vector<double> {
 	public:
         using value_type = double;
         using vector::vector;
