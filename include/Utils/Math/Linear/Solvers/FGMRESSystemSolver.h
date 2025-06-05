@@ -4,7 +4,7 @@
 
 namespace math::linal {
 
-    class FGMRESLinearSystemSolver final : public GMRESLinearSystemSolver {
+    class MATH_EXPORT FGMRESLinearSystemSolver final : public GMRESLinearSystemSolver {
     public:
         FGMRESLinearSystemSolver(size_t Krylov_subspace_dimension = 30, 
                                  const IterativeSolvingParams& iter_params = {}, 

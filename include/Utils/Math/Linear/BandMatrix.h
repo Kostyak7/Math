@@ -8,7 +8,7 @@ namespace math::linal {
      @brief Ленточная матрица особого вида
      @details Симметричная, хранятся только строки начиная с диагонального элемента
     */
-    class BandMatrix final: public IMatrixFromVector {
+    class MATH_EXPORT BandMatrix final: public IMatrixFromVector {
     public:
         BandMatrix() noexcept;
         BandMatrix(size_t size, size_t isl = 1, const value_type& default_value = {});
@@ -67,25 +67,25 @@ namespace math::linal {
         size_t m_isl = 0;
     };
 
-    void swap(BandMatrix& m1, BandMatrix& m2) noexcept;
+    void MATH_EXPORT swap(BandMatrix& m1, BandMatrix& m2) noexcept;
 
-    bool operator==(const BandMatrix& m1, const BandMatrix& m2);
-    bool operator!=(const BandMatrix& m1, const BandMatrix& m2);
+    MATH_EXPORT bool operator==(const BandMatrix& m1, const BandMatrix& m2);
+    MATH_EXPORT bool operator!=(const BandMatrix& m1, const BandMatrix& m2);
 
-    BandMatrix operator*(const BandMatrix& matrix, BandMatrix::value_type scalar);
-    BandMatrix operator*(BandMatrix::value_type scalar, const BandMatrix& matrix);
-    BandMatrix operator/(const BandMatrix& matrix, BandMatrix::value_type scalar);
+    MATH_EXPORT BandMatrix operator*(const BandMatrix& matrix, BandMatrix::value_type scalar);
+    MATH_EXPORT BandMatrix operator*(BandMatrix::value_type scalar, const BandMatrix& matrix);
+    MATH_EXPORT BandMatrix operator/(const BandMatrix& matrix, BandMatrix::value_type scalar);
 
-    DVector operator*(const BandMatrix& matrix, const DVector& vector);
-    DVector operator*(const DVector& vector, const BandMatrix& matrix);
+    MATH_EXPORT DVector operator*(const BandMatrix& matrix, const DVector& vector);
+    MATH_EXPORT DVector operator*(const DVector& vector, const BandMatrix& matrix);
 
-    BandMatrix operator*(const BandMatrix& m1, const BandMatrix& m2);
+    MATH_EXPORT BandMatrix operator*(const BandMatrix& m1, const BandMatrix& m2);
 
-    BandMatrix operator+(const BandMatrix& m1, const BandMatrix& m2);
-    BandMatrix operator-(const BandMatrix& m1, const BandMatrix& m2);
+    MATH_EXPORT BandMatrix operator+(const BandMatrix& m1, const BandMatrix& m2);
+    MATH_EXPORT BandMatrix operator-(const BandMatrix& m1, const BandMatrix& m2);
 
-    BandMatrix operator-(const BandMatrix& matrix);
+    MATH_EXPORT BandMatrix operator-(const BandMatrix& matrix);
 
-    BandMatrix inversed(const BandMatrix& matrix);
+    BandMatrix MATH_EXPORT inversed(const BandMatrix& matrix);
 
 } // namespace math::linal

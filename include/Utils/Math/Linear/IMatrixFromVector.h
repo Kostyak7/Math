@@ -4,7 +4,7 @@
 
 namespace math::linal {
 
-    class IMatrixFromVector : public IMatrix {
+    class MATH_EXPORT IMatrixFromVector : public IMatrix {
     public:
         class ConstProxyVector;
         class ProxyVector;
@@ -58,8 +58,8 @@ namespace math::linal {
         const_iterator m_front;
     };
 
-    bool operator==(const IMatrixFromVector::ConstProxyVector& v1, const IMatrixFromVector::ConstProxyVector& v2);
-    bool operator!=(const IMatrixFromVector::ConstProxyVector& v1, const IMatrixFromVector::ConstProxyVector& v2);
+    MATH_EXPORT bool operator==(const IMatrixFromVector::ConstProxyVector& v1, const IMatrixFromVector::ConstProxyVector& v2);
+    MATH_EXPORT bool operator!=(const IMatrixFromVector::ConstProxyVector& v1, const IMatrixFromVector::ConstProxyVector& v2);
 
     class IMatrixFromVector::ProxyVector {
     public:
@@ -90,7 +90,7 @@ namespace math::linal {
         iterator m_front;
     };
 
-    bool operator==(const IMatrixFromVector::ProxyVector& v1, const IMatrixFromVector::ProxyVector& v2);
-    bool operator!=(const IMatrixFromVector::ProxyVector& v1, const IMatrixFromVector::ProxyVector& v2);
+    MATH_EXPORT bool operator==(const IMatrixFromVector::ProxyVector& v1, const IMatrixFromVector::ProxyVector& v2);
+    MATH_EXPORT bool operator!=(const IMatrixFromVector::ProxyVector& v1, const IMatrixFromVector::ProxyVector& v2);
 
 } // namespace math::linal

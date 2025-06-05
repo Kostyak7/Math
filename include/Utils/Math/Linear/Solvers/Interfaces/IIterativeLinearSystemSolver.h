@@ -10,7 +10,7 @@
 
 namespace math::linal {
 
-    class IIterativeLinearSystemSolver : public ILinearSystemSolver {
+    class MATH_EXPORT IIterativeLinearSystemSolver : public ILinearSystemSolver {
     public:
 
         struct IterativeSolvingParams {

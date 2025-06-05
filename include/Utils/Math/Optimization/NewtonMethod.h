@@ -1,10 +1,12 @@
 #pragma once
 
+#include "math_export.hpp"
+
 #include <functional>
 
 namespace math::optim {
 
-    class NewtonMethod {
+    class MATH_EXPORT NewtonMethod {
     public:
         static double optimize(const std::function<double(double)>& f, const std::function<double(double)>& df, const std::function<double(double)>& ddf, double init, int steps);
     };

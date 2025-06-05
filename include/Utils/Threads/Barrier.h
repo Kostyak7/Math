@@ -1,11 +1,14 @@
 #pragma once 
 
 #include <Utils/Patterns/MoveOnlyBase.h>
+
+#include "threads_export.hpp"
+
 #include <condition_variable>
 
-namespace util::mt {
+namespace util::mthrd {
 
-    class Barrier : public MoveOnlyBase {
+    class THREADS_EXPORT Barrier : public patterns::MoveOnlyBase {
     public:
         explicit Barrier(const size_t expected) noexcept;
 
@@ -19,4 +22,4 @@ namespace util::mt {
         std::condition_variable m_cv; 
     };
 
-} // namespace util::mt
+} // namespace util::mthrd

@@ -4,7 +4,7 @@
 
 namespace math::linal {
 
-    class BiCGSTABLinearSystemSolver final : public IKrylovTypeLinearSystemSolver {
+    class MATH_EXPORT BiCGSTABLinearSystemSolver final : public IKrylovTypeLinearSystemSolver {
     public:
         BiCGSTABLinearSystemSolver(size_t Krylov_subspace_dimension = 30, 
                                    const IterativeSolvingParams& iter_params = {}, 

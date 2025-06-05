@@ -2,9 +2,11 @@
 
 #include "Vector.h"
 
+#include "math_export.hpp"
+
 namespace math::geom {
 
-    class Plane {
+    class MATH_EXPORT Plane {
     public:
         using value_type = Point3D::value_type;
 

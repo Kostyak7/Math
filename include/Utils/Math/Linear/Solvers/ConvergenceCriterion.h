@@ -6,7 +6,7 @@
 
 namespace math::linal {
 
-    class RelativeResidualCriterion : public IConvergenceCriterion {
+    class MATH_EXPORT RelativeResidualCriterion : public IConvergenceCriterion {
     public:
         explicit RelativeResidualCriterion(double tolerance = TOLERANCE)
             : m_tolerance(tolerance) 

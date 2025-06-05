@@ -1,10 +1,12 @@
 #pragma once
 
+#include "math_export.hpp"
+
 #include <functional>
 
 namespace math::optim {
 
-    class GradientDescent {
+    class MATH_EXPORT GradientDescent {
     public:
         static double optimize(const std::function<double(double)>& f, const std::function<double(double)>& df, double init, double lr, int steps);
     };

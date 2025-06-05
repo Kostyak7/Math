@@ -1,13 +1,15 @@
 #pragma once
 
+#include "math_export.hpp"
+
 #include <vector>
 
 namespace math::stat {
 
-    double mean(const std::vector<double>& data);
-    double variance(const std::vector<double>& data);
-    double covariance(const std::vector<double>& x, const std::vector<double>& y);
-    double correlation(const std::vector<double>& x, const std::vector<double>& y);
+    double MATH_EXPORT mean(const std::vector<double>& data);
+    double MATH_EXPORT variance(const std::vector<double>& data);
+    double MATH_EXPORT covariance(const std::vector<double>& x, const std::vector<double>& y);
+    double MATH_EXPORT correlation(const std::vector<double>& x, const std::vector<double>& y);
 
 } // namespace math::stat
 

@@ -1,8 +1,10 @@
 #pragma once
 
+#include "math_export.hpp"
+
 namespace math::stat {
 
-    class NormalDistribution {
+    class MATH_EXPORT NormalDistribution {
     public:
         static double pdf(double x, double mean = 0.0, double stddev = 1.0);
         static double cdf(double x, double mean = 0.0, double stddev = 1.0);

@@ -4,7 +4,7 @@
 
 namespace math::linal {
 
-    class CGLinearSystemSolver final : public IKrylovTypeLinearSystemSolver {
+    class MATH_EXPORT CGLinearSystemSolver final : public IKrylovTypeLinearSystemSolver {
     public:
         CGLinearSystemSolver(size_t Krylov_subspace_dimension = 30, 
                              const IterativeSolvingParams& iter_params = {},

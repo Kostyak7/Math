@@ -7,7 +7,7 @@ namespace math::linal {
     /**
      @brief Обычная плотная матрица 
     */
-    class DenseMatrix final: public IMatrixFromVector {
+    class MATH_EXPORT DenseMatrix final: public IMatrixFromVector {
     public:
         DenseMatrix() noexcept;
         DenseMatrix(size_t height, size_t width, const value_type& default_value = {});
@@ -59,27 +59,27 @@ namespace math::linal {
         size_t m_width;
     };
 
-    void swap(DenseMatrix& m1, DenseMatrix& m2) noexcept;
+    void MATH_EXPORT swap(DenseMatrix& m1, DenseMatrix& m2) noexcept;
 
-    bool operator==(const DenseMatrix& m1, const DenseMatrix& m2);
-    bool operator!=(const DenseMatrix& m1, const DenseMatrix& m2);
+    MATH_EXPORT bool operator==(const DenseMatrix& m1, const DenseMatrix& m2);
+    MATH_EXPORT bool operator!=(const DenseMatrix& m1, const DenseMatrix& m2);
 
-    DenseMatrix operator*(const DenseMatrix& matrix, DenseMatrix::value_type scalar);
-    DenseMatrix operator*(DenseMatrix::value_type scalar, const DenseMatrix& matrix);
-    DenseMatrix operator/(const DenseMatrix& matrix, DenseMatrix::value_type scalar);
+    MATH_EXPORT DenseMatrix operator*(const DenseMatrix& matrix, DenseMatrix::value_type scalar);
+    MATH_EXPORT DenseMatrix operator*(DenseMatrix::value_type scalar, const DenseMatrix& matrix);
+    MATH_EXPORT DenseMatrix operator/(const DenseMatrix& matrix, DenseMatrix::value_type scalar);
 
-    DVector operator*(const DenseMatrix& matrix, const DVector& vector);
-    DVector operator*(const DVector& vector, const DenseMatrix& matrix);
+    MATH_EXPORT DVector operator*(const DenseMatrix& matrix, const DVector& vector);
+    MATH_EXPORT DVector operator*(const DVector& vector, const DenseMatrix& matrix);
 
-    DenseMatrix operator*(const DenseMatrix& m1, const DenseMatrix& m2);
+    MATH_EXPORT DenseMatrix operator*(const DenseMatrix& m1, const DenseMatrix& m2);
 
-    DenseMatrix operator+(const DenseMatrix& m1, const DenseMatrix& m2);
-    DenseMatrix operator-(const DenseMatrix& m1, const DenseMatrix& m2);
+    MATH_EXPORT DenseMatrix operator+(const DenseMatrix& m1, const DenseMatrix& m2);
+    MATH_EXPORT DenseMatrix operator-(const DenseMatrix& m1, const DenseMatrix& m2);
 
-    DenseMatrix operator-(const DenseMatrix& matrix);
+    MATH_EXPORT DenseMatrix operator-(const DenseMatrix& matrix);
 
-    DenseMatrix inversed(const DenseMatrix& matrix);
+    DenseMatrix MATH_EXPORT inversed(const DenseMatrix& matrix);
 
-    DenseMatrix transposed(const DenseMatrix& matrix);
+    DenseMatrix MATH_EXPORT transposed(const DenseMatrix& matrix);
 
 } // namespace math::linal

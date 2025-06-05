@@ -4,7 +4,7 @@
 
 namespace math::linal {
 
-    class IKrylovTypeLinearSystemSolver : public IIterativeLinearSystemSolver {
+    class MATH_EXPORT IKrylovTypeLinearSystemSolver : public IIterativeLinearSystemSolver {
     public:
         IKrylovTypeLinearSystemSolver(size_t Krylov_subspace_dimension = 30, 
                                       const IterativeSolvingParams& iter_params = {}, 

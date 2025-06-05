@@ -8,7 +8,7 @@
 
 namespace math::linal {
 
-    class MGPreconditioner : public IPreconditioner {
+    class MATH_EXPORT MGPreconditioner : public IPreconditioner {
     public:
         enum class MGType {
             Algebraic,

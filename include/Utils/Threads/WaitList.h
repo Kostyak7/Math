@@ -2,12 +2,14 @@
 
 #include <Utils/Patterns/MoveOnlyBase.h>
 
+#include "threads_export.hpp"
+
 #include <future>
 #include <list>
 
-namespace fem {
+namespace util::mthrd {
 
-    class WaitList : public MoveOnlyBase {
+    class THREADS_EXPORT WaitList : public MoveOnlyBase {
     public:
         void add(std::future<void>&& future);
         void wait();
@@ -17,4 +19,4 @@ namespace fem {
         std::list<std::future<void>> m_list;
     };
 
-} // namespace fem
+} // namespace util::mthrd

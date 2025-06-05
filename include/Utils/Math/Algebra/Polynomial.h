@@ -1,13 +1,13 @@
 #pragma once
 
-#include "utils_export.h"
+#include "math_export.hpp"
 
 #include <vector>
 #include <map>
 
 namespace math::algebra {
 
-    class UTILS_EXPORT Polynomial {
+    class MATH_EXPORT Polynomial {
     public:
         using value_type = double;
 
@@ -37,8 +37,8 @@ namespace math::algebra {
         std::map<int, value_type> m_coeffs;
     };
 
-    Polynomial operator+(const Polynomial& p1, const Polynomial& p2);
-    Polynomial operator-(const Polynomial& p1, const Polynomial& p2);
-    Polynomial operator*(const Polynomial& p1, const Polynomial& p2);
+    MATH_EXPORT Polynomial operator+(const Polynomial& p1, const Polynomial& p2);
+    MATH_EXPORT Polynomial operator-(const Polynomial& p1, const Polynomial& p2);
+    MATH_EXPORT Polynomial operator*(const Polynomial& p1, const Polynomial& p2);
 
 } // namespace math::algebra

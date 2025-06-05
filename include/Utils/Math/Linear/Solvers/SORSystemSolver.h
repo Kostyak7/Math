@@ -4,7 +4,7 @@
 
 namespace math::linal {
 
-    class SORLinearSystemSolver final : public IIterativeLinearSystemSolver {
+    class MATH_EXPORT SORLinearSystemSolver final : public IIterativeLinearSystemSolver {
     public:
         SORLinearSystemSolver(double w = 1.0, 
                               size_t auto_tune_period = 10, 

@@ -6,7 +6,7 @@
 
 namespace math::linal {
 
-    class IPreconditioner {
+    class MATH_EXPORT IPreconditioner {
     public:
         virtual ~IPreconditioner() = default;
         virtual void init(const AnyMatrixConstRef& matrix) = 0;

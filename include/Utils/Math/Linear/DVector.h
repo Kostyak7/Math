@@ -1,6 +1,7 @@
 #pragma once 
 
 #include "math_export.hpp"
+
 #include <vector>
 
 namespace math::linal {
@@ -25,18 +26,18 @@ namespace math::linal {
         DVector& normalize();
 	};
 
-    bool operator==(const DVector& v1, const DVector& v2);
-    bool operator!=(const DVector& v1, const DVector& v2);
+    MATH_EXPORT bool operator==(const DVector& v1, const DVector& v2);
+    MATH_EXPORT bool operator!=(const DVector& v1, const DVector& v2);
 
-    DVector operator*(const DVector& vector, DVector::value_type scalar);
-    DVector operator*(DVector::value_type scalar, const DVector& vector);
-    DVector operator/(const DVector& vector, DVector::value_type scalar);
+    MATH_EXPORT DVector operator*(const DVector& vector, DVector::value_type scalar);
+    MATH_EXPORT DVector operator*(DVector::value_type scalar, const DVector& vector);
+    MATH_EXPORT DVector operator/(const DVector& vector, DVector::value_type scalar);
 
-    DVector operator+(const DVector& v1, const DVector& v2);
-    DVector operator-(const DVector& v1, const DVector& v2);
+    MATH_EXPORT DVector operator+(const DVector& v1, const DVector& v2);
+    MATH_EXPORT DVector operator-(const DVector& v1, const DVector& v2);
 
-    DVector operator-(const DVector& vector);
+    MATH_EXPORT DVector operator-(const DVector& vector);
 
-    DVector normalized(DVector vector);
+    DVector MATH_EXPORT normalized(DVector vector);
 
 } // namespace math::linal

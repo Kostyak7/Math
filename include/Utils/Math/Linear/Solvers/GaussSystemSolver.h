@@ -4,7 +4,7 @@
 
 namespace math::linal {
 
-    class GaussLinearSystemSolver final : public ILinearSystemSolver {
+    class MATH_EXPORT GaussLinearSystemSolver final : public ILinearSystemSolver {
     public:
         GaussLinearSystemSolver(const Params& params = {});
         DVector solve(const AnyMatrixConstRef& matrix, const DVector& rhs, const DVector& x0 = {}) override;

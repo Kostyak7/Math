@@ -17,7 +17,7 @@ namespace std {
 
 namespace math::linal {
 
-    class SparseMatrix final: public IMatrix {
+    class MATH_EXPORT SparseMatrix final: public IMatrix {
     public:
         SparseMatrix() noexcept = default;
         SparseMatrix(size_t width, size_t height);
@@ -78,27 +78,27 @@ namespace math::linal {
         friend SparseMatrix transposed(const SparseMatrix& matrix);
     };
 
-    void swap(SparseMatrix& m1, SparseMatrix& m2) noexcept;
+    void MATH_EXPORT swap(SparseMatrix& m1, SparseMatrix& m2) noexcept;
 
-    bool operator==(const SparseMatrix& m1, const SparseMatrix& m2);
-    bool operator!=(const SparseMatrix& m1, const SparseMatrix& m2);
+    MATH_EXPORT bool operator==(const SparseMatrix& m1, const SparseMatrix& m2);
+    MATH_EXPORT bool operator!=(const SparseMatrix& m1, const SparseMatrix& m2);
 
-    SparseMatrix operator*(const SparseMatrix& matrix, SparseMatrix::value_type scalar);
-    SparseMatrix operator*(SparseMatrix::value_type scalar, const SparseMatrix& matrix);
-    SparseMatrix operator/(const SparseMatrix& matrix, SparseMatrix::value_type scalar);
+    MATH_EXPORT SparseMatrix operator*(const SparseMatrix& matrix, SparseMatrix::value_type scalar);
+    MATH_EXPORT SparseMatrix operator*(SparseMatrix::value_type scalar, const SparseMatrix& matrix);
+    MATH_EXPORT SparseMatrix operator/(const SparseMatrix& matrix, SparseMatrix::value_type scalar);
 
-    DVector operator*(const SparseMatrix& matrix, const DVector& vector);
-    DVector operator*(const DVector& vector, const SparseMatrix& matrix);
+    MATH_EXPORT DVector operator*(const SparseMatrix& matrix, const DVector& vector);
+    MATH_EXPORT DVector operator*(const DVector& vector, const SparseMatrix& matrix);
 
-    SparseMatrix operator*(const SparseMatrix& m1, const SparseMatrix& m2);
+    MATH_EXPORT SparseMatrix operator*(const SparseMatrix& m1, const SparseMatrix& m2);
 
-    SparseMatrix operator+(const SparseMatrix& m1, const SparseMatrix& m2);
-    SparseMatrix operator-(const SparseMatrix& m1, const SparseMatrix& m2);
+    MATH_EXPORT SparseMatrix operator+(const SparseMatrix& m1, const SparseMatrix& m2);
+    MATH_EXPORT SparseMatrix operator-(const SparseMatrix& m1, const SparseMatrix& m2);
 
-    SparseMatrix operator-(const SparseMatrix& matrix);
+    MATH_EXPORT SparseMatrix operator-(const SparseMatrix& matrix);
 
-    SparseMatrix inversed(const SparseMatrix& matrix);
+    SparseMatrix MATH_EXPORT inversed(const SparseMatrix& matrix);
 
-    SparseMatrix transposed(const SparseMatrix& matrix);
+    SparseMatrix MATH_EXPORT transposed(const SparseMatrix& matrix);
 
 } // namespace math::linal

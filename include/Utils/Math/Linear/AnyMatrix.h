@@ -25,17 +25,17 @@ namespace math::linal {
         std::reference_wrapper<const SparseMatrix>
     >;
 
-    AnyMatrix operator*(const AnyMatrix& matrix, IMatrix::value_type scalar);
-    AnyMatrix operator*(IMatrix::value_type scalar, const AnyMatrix& matrix);
-    AnyMatrix operator/(const AnyMatrix& matrix, IMatrix::value_type scalar);
+    MATH_EXPORT AnyMatrix operator*(const AnyMatrix& matrix, IMatrix::value_type scalar);
+    MATH_EXPORT AnyMatrix operator*(IMatrix::value_type scalar, const AnyMatrix& matrix);
+    MATH_EXPORT AnyMatrix operator/(const AnyMatrix& matrix, IMatrix::value_type scalar);
 
-    DVector operator*(const AnyMatrix& matrix, const DVector& vector);
-    DVector operator*(const DVector& vector, const AnyMatrix& matrix);
+    MATH_EXPORT DVector operator*(const AnyMatrix& matrix, const DVector& vector);
+    MATH_EXPORT DVector operator*(const DVector& vector, const AnyMatrix& matrix);
 
-    AnyMatrix operator*(const AnyMatrix& m1, const AnyMatrix& m2);
+    MATH_EXPORT AnyMatrix operator*(const AnyMatrix& m1, const AnyMatrix& m2);
 
-    AnyMatrix operator+(const AnyMatrix& m1, const AnyMatrix& m2);
-    AnyMatrix operator-(const AnyMatrix& m1, const AnyMatrix& m2);
+    MATH_EXPORT AnyMatrix operator+(const AnyMatrix& m1, const AnyMatrix& m2);
+    MATH_EXPORT AnyMatrix operator-(const AnyMatrix& m1, const AnyMatrix& m2);
 
 } // namespace math::linal
 

@@ -6,7 +6,7 @@
 
 namespace math::linal {
 
-    class ILUPreconditioner : public IPreconditioner {
+    class MATH_EXPORT ILUPreconditioner : public IPreconditioner {
     public:
         void init(const AnyMatrixConstRef& matrix) override;
         class Impl;

@@ -43,7 +43,7 @@ namespace math::linal {
         virtual std::vector<std::pair<complex_value_type, std::vector<DVector>>> get_eigenvectors() const = 0;
     };
 
-    bool is_positive_definite_stochastic(const IMatrix& matrix, size_t test_points = 1000);
-    bool is_negative_definite_stochastic(const IMatrix& matrix, size_t test_points = 1000);
+    bool MATH_EXPORT is_positive_definite_stochastic(const IMatrix& matrix, size_t test_points = 1000);
+    bool MATH_EXPORT is_negative_definite_stochastic(const IMatrix& matrix, size_t test_points = 1000);
 
 } // namespace math::linal

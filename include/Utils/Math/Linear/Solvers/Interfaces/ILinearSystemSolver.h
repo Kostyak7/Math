@@ -4,7 +4,7 @@
 
 namespace math::linal {
 
-    class ILinearSystemSolver {
+    class MATH_EXPORT ILinearSystemSolver {
     public:
         struct Params {
             bool throw_exceptions = true;

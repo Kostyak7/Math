@@ -41,5 +41,4 @@ namespace math {
         return a + (b - a) * t;
     }
 
-
 } // namespace math
