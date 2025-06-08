@@ -2,11 +2,11 @@
 
 #include "ICallbackQueue.h"
 
-namespace fem {
+namespace util::mthrd {
     
     class IStoppableCallbackQueue : public ICallbackQueue {
     public:
         virtual void stop() = 0;
     };
 
-} // namespace fem
+} // namespace util::mthrd

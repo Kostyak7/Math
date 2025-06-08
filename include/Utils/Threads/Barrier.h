@@ -8,7 +8,7 @@
 
 namespace util::mthrd {
 
-    class THREADS_EXPORT Barrier : public patterns::MoveOnlyBase {
+    class THREADS_EXPORT Barrier : public pattern::MoveOnlyBase {
     public:
         explicit Barrier(const size_t expected) noexcept;
 

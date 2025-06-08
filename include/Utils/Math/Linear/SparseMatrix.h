@@ -83,9 +83,9 @@ namespace math::linal {
     MATH_EXPORT bool operator==(const SparseMatrix& m1, const SparseMatrix& m2);
     MATH_EXPORT bool operator!=(const SparseMatrix& m1, const SparseMatrix& m2);
 
-    MATH_EXPORT SparseMatrix operator*(const SparseMatrix& matrix, SparseMatrix::value_type scalar);
-    MATH_EXPORT SparseMatrix operator*(SparseMatrix::value_type scalar, const SparseMatrix& matrix);
-    MATH_EXPORT SparseMatrix operator/(const SparseMatrix& matrix, SparseMatrix::value_type scalar);
+    MATH_EXPORT SparseMatrix operator*(SparseMatrix matrix, SparseMatrix::value_type scalar);
+    MATH_EXPORT SparseMatrix operator*(SparseMatrix::value_type scalar, SparseMatrix matrix);
+    MATH_EXPORT SparseMatrix operator/(SparseMatrix matrix, SparseMatrix::value_type scalar);
 
     MATH_EXPORT DVector operator*(const SparseMatrix& matrix, const DVector& vector);
     MATH_EXPORT DVector operator*(const DVector& vector, const SparseMatrix& matrix);

@@ -20,9 +20,9 @@ namespace math::algebra {
         bool operator==(const Polynomial& other) const;
         bool operator!=(const Polynomial& other) const;
 
-        Polynomial& operator+=(const Polynomial& other) const;
-        Polynomial& operator-=(const Polynomial& other) const;
-        Polynomial& operator*=(const Polynomial& other) const;
+        Polynomial& operator+=(const Polynomial& other);
+        Polynomial& operator-=(const Polynomial& other);
+        Polynomial& operator*=(const Polynomial& other);
         Polynomial derivative() const;
         std::pair<Polynomial, Polynomial> divide(const Polynomial& other) const;
 

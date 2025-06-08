@@ -1,12 +1,12 @@
 #include <Utils/Threads/TimersFactory.h>
 #include <Utils/Threads/ICallbackQueue.h>
 
-fem::TimersFactory::TimersFactory(std::string thread_name)
+util::mthrd::TimersFactory::TimersFactory(std::string thread_name)
     : m_thread_name(std::move(thread_name))
 {
 }
 
-fem::TimersFactory::~TimersFactory() {
+util::mthrd::TimersFactory::~TimersFactory() {
     {
         std::lock_guard guard(m_mutex);
         m_stopped = true;
@@ -18,7 +18,7 @@ fem::TimersFactory::~TimersFactory() {
     }
 }
 
-class fem::TimersFactory::TimeOutedCallback::Impl : public ITimersFactory::ITimerHandlerImpl {
+class util::mthrd::TimersFactory::TimeOutedCallback::Impl : public ITimersFactory::ITimerHandlerImpl {
 public:
     TimersFactory& owner;
     const std::chrono::steady_clock::time_point expiration_time;
@@ -43,7 +43,7 @@ public:
     }
 };
 
-fem::TimersFactory::TimeOutedCallback::TimeOutedCallback(TimersFactory& papa,
+util::mthrd::TimersFactory::TimeOutedCallback::TimeOutedCallback(TimersFactory& papa,
     std::chrono::steady_clock::time_point expTime,
     std::weak_ptr<ICallbackQueue> cbq,
     std::function<void()> cb,
@@ -52,19 +52,19 @@ fem::TimersFactory::TimeOutedCallback::TimeOutedCallback(TimersFactory& papa,
 {
 }
 
-bool fem::TimersFactory::TimeOutedCallback::operator<(const TimeOutedCallback& another) const {
+bool util::mthrd::TimersFactory::TimeOutedCallback::operator<(const TimeOutedCallback& another) const {
     return impl->expiration_time < another.impl->expiration_time;
 }
 
-bool fem::TimersFactory::TimeOutedCallback::expired(std::chrono::steady_clock::time_point now) const {
+bool util::mthrd::TimersFactory::TimeOutedCallback::expired(std::chrono::steady_clock::time_point now) const {
     return impl->expiration_time <= now;
 }
 
-bool fem::TimersFactory::TimeOutedCallback::before(std::chrono::steady_clock::time_point when) const {
+bool util::mthrd::TimersFactory::TimeOutedCallback::before(std::chrono::steady_clock::time_point when) const {
     return impl->expiration_time < when;
 }
 
-fem::ITimersFactory::TimerHandler fem::TimersFactory::start_timer(std::chrono::milliseconds delay, std::weak_ptr<ICallbackQueue> cbq, std::function<void()> callback) {
+util::mthrd::ITimersFactory::TimerHandler util::mthrd::TimersFactory::start_timer(std::chrono::milliseconds delay, std::weak_ptr<ICallbackQueue> cbq, std::function<void()> callback) {
     if (cbq.expired()) {
         throw std::runtime_error("Attempt to start timer on non shared cbq");
     }
@@ -89,7 +89,7 @@ fem::ITimersFactory::TimerHandler fem::TimersFactory::start_timer(std::chrono::m
     return {};
 }
 
-void fem::TimersFactory::stop_timer_impl(const TimeOutedCallback::Impl* hndl) {
+void util::mthrd::TimersFactory::stop_timer_impl(const TimeOutedCallback::Impl* hndl) {
     std::scoped_lock lock(m_mutex);
     if (hndl->iter != m_timers.end()) {
         m_timers.erase(hndl->iter);
@@ -97,7 +97,7 @@ void fem::TimersFactory::stop_timer_impl(const TimeOutedCallback::Impl* hndl) {
 }
 
 
-void fem::TimersFactory::main_loop() {
+void util::mthrd::TimersFactory::main_loop() {
     std::unique_lock<std::mutex> lock(m_mutex);
     while (!m_stopped) {
         const auto now = std::chrono::steady_clock::now();
@@ -131,6 +131,6 @@ void fem::TimersFactory::main_loop() {
     }
 }
 
-std::shared_ptr<fem::ITimersFactory> fem::make_timers_factory(std::string thread_name) {
+std::shared_ptr<util::mthrd::ITimersFactory> util::mthrd::make_timers_factory(std::string thread_name) {
     return std::make_shared<TimersFactory>(std::move(thread_name));
 }

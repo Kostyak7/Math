@@ -70,6 +70,10 @@ math::linal::DenseMatrix::DenseMatrix(std::initializer_list<std::initializer_lis
 
 math::linal::DenseMatrix& math::linal::DenseMatrix::operator=(const DenseMatrix& matrix) {
     if (this == &matrix) return *this;
+    m_height = matrix.m_height;
+    m_width = matrix.m_width;
+    m_data = matrix.m_data;
+    return *this;
 }
 
 math::linal::DenseMatrix& math::linal::DenseMatrix::operator=(DenseMatrix&& matrix) noexcept {
@@ -261,11 +265,11 @@ math::linal::DenseMatrix math::linal::DenseMatrix::elementary_matrix_unit(size_t
 }
 
 math::linal::DenseMatrix::ConstProxyVector math::linal::DenseMatrix::get_row(size_t row) const {
-    return { m_width, std::next(m_data.begin(), row * m_width) };
+    return ConstProxyVector(m_width, std::next(m_data.begin(), row * m_width));
 }
 
 math::linal::DenseMatrix::ProxyVector math::linal::DenseMatrix::get_row(size_t row) {
-    return { m_width, std::next(m_data.begin(), row * m_width) };
+    return ProxyVector(m_width, std::next(m_data.begin(), row * m_width));
 }
 
 bool math::linal::DenseMatrix::check_row_index(size_t row) const {
@@ -297,17 +301,16 @@ bool math::linal::operator!=(const DenseMatrix& m1, const DenseMatrix& m2) {
     return !(m1 == m2);
 }
 
-math::linal::DenseMatrix math::linal::operator*(const DenseMatrix& matrix, DenseMatrix::value_type scalar) {
-    DenseMatrix res(matrix);
-    res *= scalar;
-    return res;
+math::linal::DenseMatrix math::linal::operator*(DenseMatrix matrix, DenseMatrix::value_type scalar) {
+    matrix *= scalar;
+    return matrix;
 }
 
-math::linal::DenseMatrix math::linal::operator*(DenseMatrix::value_type scalar, const DenseMatrix& matrix) {
+math::linal::DenseMatrix math::linal::operator*(DenseMatrix::value_type scalar, DenseMatrix matrix) {
     return matrix * scalar;
 }
 
-math::linal::DenseMatrix math::linal::operator/(const DenseMatrix& matrix, DenseMatrix::value_type scalar) {
+math::linal::DenseMatrix math::linal::operator/(DenseMatrix matrix, DenseMatrix::value_type scalar) {
     return matrix * (1. / scalar);
 }
 

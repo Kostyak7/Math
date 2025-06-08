@@ -8,18 +8,47 @@ namespace math::geom {
     class Matrix {
     public:
         using value_type = double;
-        
+        using base_container_type = std::array<value_type, Rows* Columns>;
+
+        class ConstRowIterator;
+        class RowIterator;
+
+        using const_iterator = ConstRowIterator;
+        using iterator = RowIterator;
+        using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+        using reverse_iterator = std::reverse_iterator<iterator>;
+
+        iterator begin() noexcept;
+        const_iterator begin() const noexcept;
+        iterator end() noexcept;
+        const_iterator end() const noexcept;
+        reverse_iterator rbegin() noexcept;
+        const_reverse_iterator rbegin() const noexcept;
+        reverse_iterator rend() noexcept;
+        const_reverse_iterator rend() const noexcept;
+        const_iterator cbegin() const noexcept;
+        const_iterator cend() const noexcept;
+        const_reverse_iterator crbegin() const noexcept;
+        const_reverse_iterator crend() const noexcept;
+
         class ConstProxyVector;
         class ProxyVector;
 
-    public:
-        Matrix();
-        Matrix(const Matrix& matrix);
-        Matrix(Matrix&& matrix) noexcept;
-        Matrix(std::initializer_list<std::initializer_list<value_type>> init);
+        ConstProxyVector front() const noexcept;
+        ProxyVector front() noexcept;
+        ConstProxyVector back() const noexcept;
+        ProxyVector back() noexcept;
 
-        Matrix& operator=(const Matrix& matrix);
-        Matrix& operator=(Matrix&& matrix) noexcept;
+    public:
+        Matrix() = default;
+        Matrix(std::initializer_list<std::initializer_list<value_type>> init);
+        Matrix(const base_container_type& container);
+        Matrix(const Matrix& other);
+        Matrix(Matrix&& other) noexcept;
+        ~Matrix() = default;
+
+        Matrix& operator=(const Matrix& other);
+        Matrix& operator=(Matrix&& other) noexcept;
 
         Matrix& operator*=(value_type scalar);
         Matrix& operator/=(value_type scalar);
@@ -27,7 +56,7 @@ namespace math::geom {
         Matrix& operator+=(const Matrix& other);
         Matrix& operator-=(const Matrix& other);
 
-        void swap(const Matrix& other) noexcept;
+        void swap(Matrix& other) noexcept;
 
         bool is_empty() const;
 
@@ -61,7 +90,7 @@ namespace math::geom {
         value_type& _(size_t row, size_t col); // Its not an operator() because in methods it is perceived as an operator,
 
     private:
-        std::array<value_type, Rows * Columns> m_data;
+        base_container_type m_data;
     };
 
     template <size_t Rows, size_t Columns>
@@ -73,11 +102,11 @@ namespace math::geom {
     bool operator!=(const Matrix<Rows, Columns>& m1, const Matrix<Rows, Columns>& m2);
 
     template <size_t Rows, size_t Columns>
-    Matrix<Rows, Columns> operator*(const Matrix<Rows, Columns>& matrix, typename Matrix<Rows, Columns>::value_type scalar);
+    Matrix<Rows, Columns> operator*(Matrix<Rows, Columns> matrix, typename Matrix<Rows, Columns>::value_type scalar);
     template <size_t Rows, size_t Columns>
-    Matrix<Rows, Columns> operator*(typename Matrix<Rows, Columns>::value_type scalar, const Matrix<Rows, Columns>& matrix);
+    Matrix<Rows, Columns> operator*(typename Matrix<Rows, Columns>::value_type scalar, Matrix<Rows, Columns> matrix);
     template <size_t Rows, size_t Columns>
-    Matrix<Rows, Columns> operator/(const Matrix<Rows, Columns>& matrix, typename Matrix<Rows, Columns>::value_type scalar);
+    Matrix<Rows, Columns> operator/(Matrix<Rows, Columns> matrix, typename Matrix<Rows, Columns>::value_type scalar);
 
     template <size_t Rows, size_t Columns>
     Vector<Rows> operator*(const Matrix<Rows, Columns>& matrix, const Vector<Columns>& vector);
@@ -88,9 +117,9 @@ namespace math::geom {
     Matrix<N, K> operator*(const Matrix<N, M>& m1, const Matrix<M, K>& m2);
 
     template <size_t Rows, size_t Columns>
-    Matrix<Rows, Columns> operator+(const Matrix<Rows, Columns>& m1, const Matrix<Rows, Columns>& m2);
+    Matrix<Rows, Columns> operator+(Matrix<Rows, Columns> m1, const Matrix<Rows, Columns>& m2);
     template <size_t Rows, size_t Columns>
-    Matrix<Rows, Columns> operator-(const Matrix<Rows, Columns>& m1, const Matrix<Rows, Columns>& m2);
+    Matrix<Rows, Columns> operator-(Matrix<Rows, Columns> m1, const Matrix<Rows, Columns>& m2);
 
     template <size_t Rows, size_t Columns>
     Matrix<Rows, Columns> operator-(const Matrix<Rows, Columns>& matrix);
@@ -111,20 +140,123 @@ namespace math::geom {
     using Matrix4x4 = Matrix<4, 4>;
 
     template <size_t Rows, size_t Columns>
+    class Matrix<Rows, Columns>::ConstRowIterator {
+    public:
+        using iterator_category = std::random_access_iterator_tag;
+        using value_type = ConstProxyVector;
+        using difference_type = std::ptrdiff_t;
+        using pointer = const ConstProxyVector*;
+        using reference = const ConstProxyVector&;
+
+        ConstRowIterator(const Matrix* matrix, size_t row);
+
+        reference operator*() const;
+        pointer operator->() const;
+
+        ConstRowIterator& operator++();
+        ConstRowIterator operator++(int);
+        ConstRowIterator& operator--();
+        ConstRowIterator operator--(int);
+
+        ConstRowIterator operator+(difference_type n) const;
+        ConstRowIterator operator-(difference_type n) const;
+        template <class Iter> difference_type operator-(const Iter& other) const;
+
+        template <class Iter> bool operator==(const Iter& other) const;
+        template <class Iter> bool operator!=(const Iter& other) const;
+        template <class Iter> bool operator<(const Iter& other) const;
+        template <class Iter> bool operator>(const Iter& other) const;
+        template <class Iter> bool operator<=(const Iter& other) const;
+        template <class Iter> bool operator>=(const Iter& other) const;
+
+        ConstRowIterator& operator+=(difference_type n);
+        ConstRowIterator& operator-=(difference_type n);
+
+        reference operator[](difference_type n) const;
+
+    private:
+        const Matrix* m_matrix;
+        size_t m_row;
+        mutable ConstProxyVector m_proxy;
+    };
+
+    template <size_t Rows, size_t Columns>
+    class Matrix<Rows, Columns>::RowIterator {
+    public:
+        using iterator_category = std::random_access_iterator_tag;
+        using value_type = ProxyVector;
+        using difference_type = std::ptrdiff_t;
+        using pointer = ProxyVector*;
+        using reference = ProxyVector&;
+
+        RowIterator(Matrix* matrix, size_t row);
+
+        const reference operator*() const;
+        reference operator*();
+
+        const pointer operator->() const;
+        pointer operator->();
+
+        RowIterator& operator++();
+        RowIterator operator++(int);
+        RowIterator& operator--();
+        RowIterator operator--(int);
+
+        RowIterator operator+(difference_type n) const;
+        RowIterator operator-(difference_type n) const;
+        template <class Iter> difference_type operator-(const Iter& other) const;
+
+        template <class Iter> bool operator==(const Iter& other) const;
+        template <class Iter> bool operator!=(const Iter& other) const;
+        template <class Iter> bool operator<(const Iter& other) const;
+        template <class Iter> bool operator>(const Iter& other) const;
+        template <class Iter> bool operator<=(const Iter& other) const;
+        template <class Iter> bool operator>=(const Iter& other) const;
+
+        RowIterator& operator+=(difference_type n);
+        RowIterator& operator-=(difference_type n);
+
+        const reference operator[](difference_type n) const;
+        reference operator[](difference_type n);
+
+    private:
+        Matrix* m_matrix;
+        size_t m_row;
+        mutable ProxyVector m_proxy;
+    };
+
+    template <size_t Rows, size_t Columns>
     class Matrix<Rows, Columns>::ConstProxyVector {
     public:
-        using const_iterator = typename std::array<value_type, Columns>::const_iterator;
+        using const_iterator = typename base_container_type::const_iterator;
+        using const_reverse_iterator = typename base_container_type::const_reverse_iterator;
 
-        const_iterator begin() const;
-        const_iterator end() const;
+        const_iterator begin() const noexcept;
+        const_iterator end() const noexcept;
+        const_reverse_iterator rbegin() const noexcept;
+        const_reverse_iterator rend() const noexcept;
+        const_iterator cbegin() const noexcept;
+        const_iterator cend() const noexcept;
+        const_reverse_iterator crbegin() const noexcept;
+        const_reverse_iterator crend() const noexcept;
+
+        const value_type& front() const noexcept;
+        const value_type& back() const noexcept;
 
     public:
         ConstProxyVector(const_iterator front);
 
-        value_type operator[](size_t col) const;
-
         size_t size() const;
         bool empty() const;
+
+        bool is_zero() const;
+
+        const value_type& operator[](size_t pos) const noexcept;
+
+        value_type dot(const Vector<Columns>& other) const;
+        value_type dot(const ProxyVector& other) const;
+        value_type norm() const;
+        value_type length() const;
 
         operator Vector<Columns>() const;
 
@@ -133,29 +265,62 @@ namespace math::geom {
     };
 
     template <size_t Rows, size_t Columns>
-    bool operator==(const Matrix<Rows, Columns>::ConstProxyVector& v1, const Matrix<Rows, Columns>::ConstProxyVector& v2);
+    bool operator==(typename const Matrix<Rows, Columns>::ConstProxyVector& v1, typename const Matrix<Rows, Columns>::ConstProxyVector& v2);
     template <size_t Rows, size_t Columns>
-    bool operator!=(const Matrix<Rows, Columns>::ConstProxyVector& v1, const Matrix<Rows, Columns>::ConstProxyVector& v2);
+    bool operator!=(typename const Matrix<Rows, Columns>::ConstProxyVector& v1, typename const Matrix<Rows, Columns>::ConstProxyVector& v2);
 
     template <size_t Rows, size_t Columns>
     class Matrix<Rows, Columns>::ProxyVector {
     public:
-        using const_iterator = typename std::array<value_type, Columns>::const_iterator;
-        using iterator = typename std::vector<value_type, Columns>::iterator;
+        using const_iterator = typename base_container_type::const_iterator;
+        using iterator = typename base_container_type::iterator;
+        using const_reverse_iterator = typename base_container_type::const_reverse_iterator;
+        using reverse_iterator = typename base_container_type::reverse_iterator;
 
-        const_iterator begin() const;
-        const_iterator end() const;
-        iterator begin();
-        iterator end();
+        iterator begin() noexcept;
+        const_iterator begin() const noexcept;
+        iterator end() noexcept;
+        const_iterator end() const noexcept;
+        reverse_iterator rbegin() noexcept;
+        const_reverse_iterator rbegin() const noexcept;
+        reverse_iterator rend() noexcept;
+        const_reverse_iterator rend() const noexcept;
+        const_iterator cbegin() const noexcept;
+        const_iterator cend() const noexcept;
+        const_reverse_iterator crbegin() const noexcept;
+        const_reverse_iterator crend() const noexcept;
+
+        const value_type& front() const noexcept;
+        value_type& front() noexcept;
+        const value_type& back() const noexcept;
+        value_type& back() noexcept;
 
     public:
         ProxyVector(iterator front);
+        ProxyVector(const ConstProxyVector& proxy);
 
-        value_type operator[](size_t col) const;
-        value_type& operator[](size_t col);
+        ProxyVector& operator*=(value_type scalar);
+        ProxyVector& operator/=(value_type scalar);
+
+        ProxyVector& operator+=(const ProxyVector& other);
+        ProxyVector& operator-=(const ProxyVector& other);
 
         size_t size() const;
         bool empty() const;
+
+        void fill(value_type value);
+
+        bool is_zero() const;
+
+        const value_type& operator[](size_t pos) const noexcept;
+        value_type& operator[](size_t pos) noexcept;
+
+        value_type dot(const Vector<Columns>& other) const;
+        value_type dot(const ProxyVector& other) const;
+        value_type norm() const;
+        value_type length() const;
+
+        ProxyVector& normalize();
 
         operator Vector<Columns>() const;
 
@@ -164,9 +329,9 @@ namespace math::geom {
     };
 
     template <size_t Rows, size_t Columns>
-    bool operator==(const Matrix<Rows, Columns>::ProxyVector& v1, const Matrix<Rows, Columns>::ProxyVector& v2);
+    bool operator==(typename const Matrix<Rows, Columns>::ProxyVector& v1, typename const Matrix<Rows, Columns>::ProxyVector& v2);
     template <size_t Rows, size_t Columns>
-    bool operator!=(const Matrix<Rows, Columns>::ProxyVector& v1, const Matrix<Rows, Columns>::ProxyVector& v2);
+    bool operator!=(typename const Matrix<Rows, Columns>::ProxyVector& v1, typename const Matrix<Rows, Columns>::ProxyVector& v2);
 
 } // namespace math::geom
 

@@ -5,7 +5,7 @@
 #include <chrono>
 #include <string>
 
-namespace fem {
+namespace util::mthrd {
 
     class ICallbackQueue;
 
@@ -35,4 +35,4 @@ namespace fem {
 
     std::shared_ptr<ITimersFactory> make_timers_factory(std::string thread_name);
 
-} // namespace fem
+} // namespace util::mthrd

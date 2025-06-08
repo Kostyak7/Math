@@ -8,10 +8,10 @@
 #include <queue>
 #include <thread>
 
-namespace fem {
+namespace util::mthrd {
 
     template <typename T>
-    class BlockingQueue : public MoveOnlyBase {
+    class BlockingQueue : public pattern::MoveOnlyBase {
     public:
         using OnOverflow = std::function<void(size_t)>;
         using OnBecomeNormal = std::function<void(size_t)>;
@@ -58,6 +58,6 @@ namespace fem {
         const OnBecomeNormal m_on_become_normal;
     };
 
-} // namespace fem
+} // namespace util::mthrd
 
 #include "BlockingQueue.tpp"

@@ -9,7 +9,7 @@
 
 namespace util::mthrd {
 
-    class THREADS_EXPORT WaitList : public MoveOnlyBase {
+    class THREADS_EXPORT WaitList : public pattern::MoveOnlyBase {
     public:
         void add(std::future<void>&& future);
         void wait();

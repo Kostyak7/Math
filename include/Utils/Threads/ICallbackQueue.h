@@ -8,7 +8,7 @@
 #include <thread>
 #include <type_traits>
 
-namespace fem {
+namespace util::mthrd {
 
     class ICallbackQueue {
     public:
@@ -103,6 +103,6 @@ namespace fem {
         std::future<std::invoke_result_t<F>> add_command(ExecutionType type, F&& callback, std::optional<std::weak_ptr<const void>> lifetime = std::nullopt);
     };
 
-} // namespace fem
+} // namespace util::mthrd
 
 #include "ICallbackQueue.tpp"

@@ -2,14 +2,14 @@
 
 #include <stdexcept>
 
-fem::Barrier::Barrier(const size_t expected) noexcept
+util::mthrd::Barrier::Barrier(const size_t expected) noexcept
     : m_total(expected)
     , m_arrived(0)
     , m_generation(0)
 {
 }
 
-void fem::Barrier::arrive_and_wait() noexcept {
+void util::mthrd::Barrier::arrive_and_wait() noexcept {
     std::unique_lock<std::mutex> lock(m_mutex);
     const auto gen = m_generation.load();  // Текущий "поколение" 
 

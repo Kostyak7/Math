@@ -68,6 +68,10 @@ math::linal::BandMatrix::BandMatrix(std::initializer_list<std::initializer_list<
 
 math::linal::BandMatrix& math::linal::BandMatrix::operator=(const BandMatrix& matrix) {
     if (this == &matrix) return *this;
+    m_size = matrix.m_size;
+    m_isl = matrix.m_isl;
+    m_data = matrix.m_data;
+    return *this;
 }
 
 math::linal::BandMatrix& math::linal::BandMatrix::operator=(BandMatrix&& matrix) noexcept {
@@ -301,11 +305,11 @@ math::linal::BandMatrix math::linal::BandMatrix::elementary_matrix_unit(size_t n
 }
 
 math::linal::BandMatrix::ConstProxyVector math::linal::BandMatrix::get_row(size_t row) const {
-    return { m_isl, std::next(m_data.begin(), row * m_isl) };
+    return ConstProxyVector(m_isl, std::next(m_data.begin(), row * m_isl));
 }
 
 math::linal::BandMatrix::ProxyVector math::linal::BandMatrix::get_row(size_t row) {
-    return { m_isl, std::next(m_data.begin(), row * m_isl) };
+    return ProxyVector(m_isl, std::next(m_data.begin(), row * m_isl));
 }
 
 bool math::linal::BandMatrix::check_row_index(size_t row) const {
@@ -348,17 +352,16 @@ bool math::linal::operator!=(const BandMatrix& m1, const BandMatrix& m2) {
     return !(m1 == m2);
 }
 
-math::linal::BandMatrix math::linal::operator*(const BandMatrix& matrix, BandMatrix::value_type scalar) {
-    BandMatrix res(matrix);
-    res *= scalar;
-    return res;
+math::linal::BandMatrix math::linal::operator*(BandMatrix matrix, BandMatrix::value_type scalar) {
+    matrix *= scalar;
+    return matrix;
 }
 
-math::linal::BandMatrix math::linal::operator*(BandMatrix::value_type scalar, const BandMatrix& matrix) {
+math::linal::BandMatrix math::linal::operator*(BandMatrix::value_type scalar, BandMatrix matrix) {
     return matrix * scalar;
 }
 
-math::linal::BandMatrix math::linal::operator/(const BandMatrix& matrix, BandMatrix::value_type scalar) {
+math::linal::BandMatrix math::linal::operator/(BandMatrix matrix, BandMatrix::value_type scalar) {
     return matrix * (1. / scalar);
 }
 

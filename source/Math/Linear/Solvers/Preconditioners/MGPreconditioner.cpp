@@ -189,7 +189,7 @@ namespace {
 
             residual = rhs - A * x;
             coarse_rhs = restrict(residual, level_idx);
-            coarse_correction.assign(coarse_rhs.size(), 0.0);
+            coarse_correction.resize(coarse_rhs.size(), 0.0);
             v_cycle(level_idx + 1, coarse_rhs, coarse_correction);
             correction = interpolate(coarse_correction, level_idx);
             x += correction;

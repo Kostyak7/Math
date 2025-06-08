@@ -1,8 +1,8 @@
 template <class InitiatorType>
-fem::Connection<InitiatorType>::Scope fem::Connection<InitiatorType>::scope(InitiatorType* initiator) { return Scope(*this, initiator); }
+util::mthrd::Connection<InitiatorType>::Scope util::mthrd::Connection<InitiatorType>::scope(InitiatorType* initiator) { return Scope(*this, initiator); }
 
 template <class InitiatorType>
-bool fem::Connection<InitiatorType>::in_scope() {
+bool util::mthrd::Connection<InitiatorType>::in_scope() {
     std::unique_lock lock(m_mutex);
     return m_depth != 0 &&
         std::any_of(m_friends.begin(), m_friends.end(),
@@ -11,7 +11,7 @@ bool fem::Connection<InitiatorType>::in_scope() {
 }
 
 template <class InitiatorType>
-void fem::Connection<InitiatorType>::open_scope(InitiatorType* initiator) {
+void util::mthrd::Connection<InitiatorType>::open_scope(InitiatorType* initiator) {
     std::unique_lock lock(m_mutex);
     if (m_depth == 0) {
         m_friends.push_back(std::this_thread::get_id());
@@ -21,7 +21,7 @@ void fem::Connection<InitiatorType>::open_scope(InitiatorType* initiator) {
 }
 
 template <class InitiatorType>
-void fem::Connection<InitiatorType>::close_scope() {
+void util::mthrd::Connection<InitiatorType>::close_scope() {
     std::unique_lock lock(m_mutex);
     --m_depth;
     if (m_depth == 0) {
@@ -31,7 +31,7 @@ void fem::Connection<InitiatorType>::close_scope() {
 }
 
 template <class InitiatorType>
-bool fem::Connection<InitiatorType>::make_friend(std::thread::id thread) {
+bool util::mthrd::Connection<InitiatorType>::make_friend(std::thread::id thread) {
     std::unique_lock lock(m_mutex);
     if (in_scope()) {
         m_friends.push_back(thread);
@@ -41,13 +41,13 @@ bool fem::Connection<InitiatorType>::make_friend(std::thread::id thread) {
 }
 
 template <class InitiatorType>
-void fem::Connection<InitiatorType>::lose_friend(std::thread::id thread) {
+void util::mthrd::Connection<InitiatorType>::lose_friend(std::thread::id thread) {
     std::unique_lock lock(m_mutex);
     if (in_scope())
         m_friends.remove(thread);
 }
 
 template <class InitiatorType>
-InitiatorType* fem::Connection<InitiatorType>::get_initiator() {
+InitiatorType* util::mthrd::Connection<InitiatorType>::get_initiator() {
     return m_initiator;
 }

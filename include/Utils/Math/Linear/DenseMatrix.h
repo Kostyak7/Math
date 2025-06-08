@@ -64,9 +64,9 @@ namespace math::linal {
     MATH_EXPORT bool operator==(const DenseMatrix& m1, const DenseMatrix& m2);
     MATH_EXPORT bool operator!=(const DenseMatrix& m1, const DenseMatrix& m2);
 
-    MATH_EXPORT DenseMatrix operator*(const DenseMatrix& matrix, DenseMatrix::value_type scalar);
-    MATH_EXPORT DenseMatrix operator*(DenseMatrix::value_type scalar, const DenseMatrix& matrix);
-    MATH_EXPORT DenseMatrix operator/(const DenseMatrix& matrix, DenseMatrix::value_type scalar);
+    MATH_EXPORT DenseMatrix operator*(DenseMatrix matrix, DenseMatrix::value_type scalar);
+    MATH_EXPORT DenseMatrix operator*(DenseMatrix::value_type scalar, DenseMatrix matrix);
+    MATH_EXPORT DenseMatrix operator/(DenseMatrix matrix, DenseMatrix::value_type scalar);
 
     MATH_EXPORT DVector operator*(const DenseMatrix& matrix, const DVector& vector);
     MATH_EXPORT DVector operator*(const DVector& vector, const DenseMatrix& matrix);

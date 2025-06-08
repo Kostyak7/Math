@@ -1,7 +1,7 @@
 #pragma once
 
 template<class T>
-fem::BlockingQueue<T>::BlockingQueue(size_t max_size, OnOverflow on_overflow, OnBecomeNormal on_become_normal)
+util::mthrd::BlockingQueue<T>::BlockingQueue(size_t max_size, OnOverflow on_overflow, OnBecomeNormal on_become_normal)
     : m_max_size(max_size)
     , m_on_overflow(std::move(on_overflow))
     , m_on_become_normal(std::move(on_become_normal))
@@ -9,7 +9,7 @@ fem::BlockingQueue<T>::BlockingQueue(size_t max_size, OnOverflow on_overflow, On
 }
 
 template<class T>
-void fem::BlockingQueue<T>::pop(T& item) {
+void util::mthrd::BlockingQueue<T>::pop(T& item) {
     pop_impl(item, [this](std::unique_lock<std::mutex>& lock) {
         m_cv.wait(lock, [this]() { return !m_queue.empty(); });
         return true;
@@ -18,13 +18,13 @@ void fem::BlockingQueue<T>::pop(T& item) {
 }
 
 template<class T>
-bool fem::BlockingQueue<T>::try_pop(T& item) {
+bool util::mthrd::BlockingQueue<T>::try_pop(T& item) {
     return pop_impl(item, [this](auto& /*lock*/) { return !m_queue.empty(); });
 }
 
 template<class T>
 template <typename Duration>
-bool fem::BlockingQueue<T>::try_pop(T& item, const Duration duration) {
+bool util::mthrd::BlockingQueue<T>::try_pop(T& item, const Duration duration) {
     return pop_impl(item, [this, duration](std::unique_lock<std::mutex>& lock) {
         return !m_cv.wait_for(lock, duration, [this]() { return !m_queue.empty(); });
         }
@@ -32,7 +32,7 @@ bool fem::BlockingQueue<T>::try_pop(T& item, const Duration duration) {
 }
 
 template<class T>
-void fem::BlockingQueue<T>::push(T item) {
+void util::mthrd::BlockingQueue<T>::push(T item) {
     std::unique_lock mlock(m_mutex);
     const auto old_size = m_queue.size();
     const auto max_size = m_max_size;
@@ -47,7 +47,7 @@ void fem::BlockingQueue<T>::push(T item) {
 }
 
 template<class T>
-bool fem::BlockingQueue<T>::try_push(T item) {
+bool util::mthrd::BlockingQueue<T>::try_push(T item) {
     std::scoped_lock mlock(m_mutex);
     if (m_queue.size() < m_max_size) {
         m_queue.push(std::move(item));
@@ -58,20 +58,20 @@ bool fem::BlockingQueue<T>::try_push(T item) {
 }
 
 template<class T>
-size_t fem::BlockingQueue<T>::size() const {
+size_t util::mthrd::BlockingQueue<T>::size() const {
     std::scoped_lock lock(m_mutex);
     return m_queue.size();
 }
 
 template<class T>
-void fem::BlockingQueue<T>::clear() {
+void util::mthrd::BlockingQueue<T>::clear() {
     std::queue<T> q;
     std::scoped_lock lock(m_mutex);
     m_queue.swap(q);
 }
 
 template<class T>
-void fem::BlockingQueue<T>::set_max_size(size_t size) {
+void util::mthrd::BlockingQueue<T>::set_max_size(size_t size) {
     std::scoped_lock lock(m_mutex);
     m_max_size = size;
 }

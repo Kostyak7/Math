@@ -6,7 +6,7 @@
 #include <thread>
 #include <condition_variable>
 
-namespace fem {
+namespace util::mthrd {
 
     class TimersFactory : public ITimersFactory {
     public:
@@ -41,4 +41,4 @@ namespace fem {
         std::atomic<bool> m_stopped = false;
     };
 
-} // namespace fem
+} // namespace util::mthrd

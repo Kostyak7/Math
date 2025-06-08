@@ -4,23 +4,23 @@ namespace {
     constexpr size_t DEFAULT_CBQ_MAX_SIZE = 1000;
 } // namespace 
 
-fem::CallbackQueue::CallbackQueue(std::string name)
+util::mthrd::CallbackQueue::CallbackQueue(std::string name)
     : CallbackQueue(std::move(name), DEFAULT_CBQ_MAX_SIZE)
 {
 }
 
-fem::CallbackQueue::CallbackQueue(std::shared_ptr<ITimersFactory> timers_factory, std::string name)
+util::mthrd::CallbackQueue::CallbackQueue(std::shared_ptr<ITimersFactory> timers_factory, std::string name)
     : CallbackQueue(std::move(timers_factory), std::move(name), DEFAULT_CBQ_MAX_SIZE)
 {
 }
 
-fem::CallbackQueue::CallbackQueue(std::string name, size_t max_size, OnOverflow on_overflow_callback, OnBecomeNormal on_become_normal_callback)
+util::mthrd::CallbackQueue::CallbackQueue(std::string name, size_t max_size, OnOverflow on_overflow_callback, OnBecomeNormal on_become_normal_callback)
     : CallbackQueue(make_timers_factory("TF" + name), std::move(name), max_size, std::move(on_overflow_callback), std::move(on_become_normal_callback))
 {
 }
    
 
-fem::CallbackQueue::CallbackQueue(std::shared_ptr<ITimersFactory> timers_factory, std::string name, size_t max_size, OnOverflow on_overflow_callback, OnBecomeNormal on_become_normal_callback)
+util::mthrd::CallbackQueue::CallbackQueue(std::shared_ptr<ITimersFactory> timers_factory, std::string name, size_t max_size, OnOverflow on_overflow_callback, OnBecomeNormal on_become_normal_callback)
     : m_name(std::move(name))
     , m_queue(max_size, std::move(on_overflow_callback), std::move(on_become_normal_callback))
     , m_timers_factory(std::move(timers_factory))
@@ -28,7 +28,7 @@ fem::CallbackQueue::CallbackQueue(std::shared_ptr<ITimersFactory> timers_factory
     start();
 }
 
-fem::CallbackQueue::~CallbackQueue() {
+util::mthrd::CallbackQueue::~CallbackQueue() {
     if (m_queue_thread.get_id() != std::this_thread::get_id()) {
         throw std::runtime_error{ "Try dstory callback queue inside itself: " + get_name() };
     }
@@ -36,14 +36,14 @@ fem::CallbackQueue::~CallbackQueue() {
     stop();
 }
 
-void fem::CallbackQueue::start() {
+void util::mthrd::CallbackQueue::start() {
     m_queue_thread = std::thread([this]() mutable {
         main_loop();
         });
     m_therad_id.store(m_queue_thread.get_id());
 }
 
-void fem::CallbackQueue::stop() {
+void util::mthrd::CallbackQueue::stop() {
     m_stopped.store(true);
 
     if (m_queue_thread.joinable()) {
@@ -53,7 +53,7 @@ void fem::CallbackQueue::stop() {
     }
 }
 
-void fem::CallbackQueue::add_callback(std::function<void()> callback) {
+void util::mthrd::CallbackQueue::add_callback(std::function<void()> callback) {
     if (m_stopped) {
         return;
     }
@@ -65,11 +65,11 @@ void fem::CallbackQueue::add_callback(std::function<void()> callback) {
     m_queue.push(std::move(callback));
 }
 
-void fem::CallbackQueue::add_callback(std::function<void()> callback, std::weak_ptr<const void> lifetime) {
+void util::mthrd::CallbackQueue::add_callback(std::function<void()> callback, std::weak_ptr<const void> lifetime) {
     add_callback(make_safe_callback(std::move(callback), std::move(lifetime)));
 }
 
-bool fem::CallbackQueue::try_add_callback(std::function<void()> callback) {
+bool util::mthrd::CallbackQueue::try_add_callback(std::function<void()> callback) {
     if (m_stopped) {
         return false;
     }
@@ -81,26 +81,26 @@ bool fem::CallbackQueue::try_add_callback(std::function<void()> callback) {
     return m_queue.try_push(std::move(callback));
 }
 
-bool fem::CallbackQueue::try_add_callback(std::function<void()> callback, std::weak_ptr<const void> lifetime) {
+bool util::mthrd::CallbackQueue::try_add_callback(std::function<void()> callback, std::weak_ptr<const void> lifetime) {
     return try_add_callback(make_safe_callback(std::move(callback), std::move(lifetime)));
 }
 
-fem::ICallbackQueue::DelayedHandler fem::CallbackQueue::add_delayed_callback(std::function<void()> callback, std::chrono::milliseconds time_out) {
+util::mthrd::ICallbackQueue::DelayedHandler util::mthrd::CallbackQueue::add_delayed_callback(std::function<void()> callback, std::chrono::milliseconds time_out) {
     if (m_stopped) {
         return {};
     }
     return m_timers_factory->start_timer(time_out, weak_from_this(), std::move(callback));
 }
 
-fem::ICallbackQueue::DelayedHandler fem::CallbackQueue::add_delayed_callback(std::function<void()> callback, std::chrono::milliseconds time_out, std::weak_ptr<const void> lifetime) {
+util::mthrd::ICallbackQueue::DelayedHandler util::mthrd::CallbackQueue::add_delayed_callback(std::function<void()> callback, std::chrono::milliseconds time_out, std::weak_ptr<const void> lifetime) {
     return add_delayed_callback(make_safe_callback(std::move(callback), std::move(lifetime)), time_out);
 }
 
-void fem::CallbackQueue::remove_delayed_callback(ICallbackQueue::DelayedHandler& hndl) {
+void util::mthrd::CallbackQueue::remove_delayed_callback(ICallbackQueue::DelayedHandler& hndl) {
     hndl.stop_timer();
 }
 
-void fem::CallbackQueue::wait(AwatingType awating_type) {
+void util::mthrd::CallbackQueue::wait(AwatingType awating_type) {
     if (m_queue_thread.get_id() == std::this_thread::get_id()) {
         throw std::logic_error("DEAD LOCK in wait() call: can't awaiting inside CallbackQueue " + get_name());
     }
@@ -127,7 +127,7 @@ void fem::CallbackQueue::wait(AwatingType awating_type) {
     }
 }
 
-void fem::CallbackQueue::main_loop() {
+void util::mthrd::CallbackQueue::main_loop() {
     std::function<void()> callback;
     do {
         callback = nullptr;
@@ -143,30 +143,30 @@ void fem::CallbackQueue::main_loop() {
     } while (callback);
 }
 
-std::thread::id fem::CallbackQueue::get_thread_id() const noexcept {
+std::thread::id util::mthrd::CallbackQueue::get_thread_id() const noexcept {
     return m_therad_id.load();
 }
 
-bool fem::CallbackQueue::is_working_thread() const noexcept {
+bool util::mthrd::CallbackQueue::is_working_thread() const noexcept {
     return get_thread_id() == std::this_thread::get_id();
 }
 
-std::string fem::CallbackQueue::get_name() const {
+std::string util::mthrd::CallbackQueue::get_name() const {
     return m_name;
 }
 
-size_t fem::CallbackQueue::size() const {
+size_t util::mthrd::CallbackQueue::size() const {
     return m_queue.size();
 }
 
-void fem::CallbackQueue::set_max_size(size_t size) {
+void util::mthrd::CallbackQueue::set_max_size(size_t size) {
     m_queue.set_max_size(size);
 }
 
-void fem::CallbackQueue::clear() {
+void util::mthrd::CallbackQueue::clear() {
     m_queue.clear();
 }
 
-std::shared_ptr<fem::ITimersFactory> fem::CallbackQueue::get_timers_factory() {
+std::shared_ptr<util::mthrd::ITimersFactory> util::mthrd::CallbackQueue::get_timers_factory() {
     return m_timers_factory;
 }

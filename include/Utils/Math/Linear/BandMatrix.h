@@ -72,9 +72,9 @@ namespace math::linal {
     MATH_EXPORT bool operator==(const BandMatrix& m1, const BandMatrix& m2);
     MATH_EXPORT bool operator!=(const BandMatrix& m1, const BandMatrix& m2);
 
-    MATH_EXPORT BandMatrix operator*(const BandMatrix& matrix, BandMatrix::value_type scalar);
-    MATH_EXPORT BandMatrix operator*(BandMatrix::value_type scalar, const BandMatrix& matrix);
-    MATH_EXPORT BandMatrix operator/(const BandMatrix& matrix, BandMatrix::value_type scalar);
+    MATH_EXPORT BandMatrix operator*(BandMatrix matrix, BandMatrix::value_type scalar);
+    MATH_EXPORT BandMatrix operator*(BandMatrix::value_type scalar, BandMatrix matrix);
+    MATH_EXPORT BandMatrix operator/(BandMatrix matrix, BandMatrix::value_type scalar);
 
     MATH_EXPORT DVector operator*(const BandMatrix& matrix, const DVector& vector);
     MATH_EXPORT DVector operator*(const DVector& vector, const BandMatrix& matrix);

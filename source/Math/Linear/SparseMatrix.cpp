@@ -301,17 +301,16 @@ bool math::linal::operator!=(const SparseMatrix& m1, const SparseMatrix& m2) {
     return !(m1 == m2);
 }
 
-math::linal::SparseMatrix math::linal::operator*(const SparseMatrix& matrix, SparseMatrix::value_type scalar) {
-    SparseMatrix res(matrix);
-    res *= scalar;
-    return res;
+math::linal::SparseMatrix math::linal::operator*(SparseMatrix matrix, SparseMatrix::value_type scalar) {
+    matrix *= scalar;
+    return matrix;
 }
 
-math::linal::SparseMatrix math::linal::operator*(SparseMatrix::value_type scalar, const SparseMatrix& matrix) {
+math::linal::SparseMatrix math::linal::operator*(SparseMatrix::value_type scalar, SparseMatrix matrix) {
     return matrix * scalar;
 }
 
-math::linal::SparseMatrix math::linal::operator/(const SparseMatrix& matrix, SparseMatrix::value_type scalar) {
+math::linal::SparseMatrix math::linal::operator/(SparseMatrix matrix, SparseMatrix::value_type scalar) {
     return matrix * (1. / scalar);
 }
 

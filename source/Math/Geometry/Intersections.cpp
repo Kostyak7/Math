@@ -37,16 +37,16 @@ std::optional<math::geom::Point3D> math::geom::intersection_point(const Vector3D
     return {};
 }
 
-std::optional<math::geom::Vector3D> math::geom::intersection_vector(const Plane& plane, const Plane& plane) {
+std::optional<math::geom::Vector3D> math::geom::intersection_vector(const Plane& pln1, const Plane& pln2) {
     // ...
     return {};
 }
 
 bool math::geom::is_point_in_triangle(const Point2D& p, const Point2D& a, const Point2D& b, const Point2D& c) {
-    double area = signed_area(a, b, c);
-    double area1 = signed_area(p, b, c);
-    double area2 = signed_area(a, p, c);
-    double area3 = signed_area(a, b, p);
+    double area = triangle_area(a, b, c);
+    double area1 = triangle_area(p, b, c);
+    double area2 = triangle_area(a, p, c);
+    double area3 = triangle_area(a, b, p);
     return is_near(area1 + area2 + area3, area);
 }
 

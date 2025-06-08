@@ -3,49 +3,144 @@
 //////////////////////////////////////////
 
 template <size_t Rows, size_t Columns>
-math::geom::Matrix<Rows, Columns>::Matrix()
-	: m_data({})
-{
+typename math::geom::Matrix<Rows, Columns>::iterator math::geom::Matrix<Rows, Columns>::begin() noexcept {
+    return RowIterator(this, 0);
 }
 
 template <size_t Rows, size_t Columns>
-math::geom::Matrix<Rows, Columns>::Matrix(const Matrix& matrix) {
-	for (size_t i = 0; i < Rows * Columns; ++i) {
-		m_data[i] = matrix.m_data[i];
-	}
+typename math::geom::Matrix<Rows, Columns>::const_iterator math::geom::Matrix<Rows, Columns>::begin() const noexcept {
+    return ConstRowIterator(this, 0);
 }
 
 template <size_t Rows, size_t Columns>
-math::geom::Matrix<Rows, Columns>::Matrix(Matrix&& matrix) noexcept 
-	: m_data(std::move(matrix.m_data))
-{
+typename math::geom::Matrix<Rows, Columns>::iterator math::geom::Matrix<Rows, Columns>::end() noexcept {
+    return RowIterator(this, Columns);
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::const_iterator math::geom::Matrix<Rows, Columns>::end() const noexcept {
+    return ConstRowIterator(this, Columns);
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::reverse_iterator math::geom::Matrix<Rows, Columns>::rbegin() noexcept {
+    return std::reverse_iterator(end());
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::const_reverse_iterator math::geom::Matrix<Rows, Columns>::rbegin() const noexcept {
+    return std::reverse_iterator(end());
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::reverse_iterator math::geom::Matrix<Rows, Columns>::rend() noexcept {
+    return std::reverse_iterator(begin());
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::const_reverse_iterator math::geom::Matrix<Rows, Columns>::rend() const noexcept {
+    return std::reverse_iterator(begin());
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::const_iterator math::geom::Matrix<Rows, Columns>::cbegin() const noexcept {
+    return begin();
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::const_iterator math::geom::Matrix<Rows, Columns>::cend() const noexcept {
+    return end();
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::const_reverse_iterator math::geom::Matrix<Rows, Columns>::crbegin() const noexcept {
+    return rbegin();
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::const_reverse_iterator math::geom::Matrix<Rows, Columns>::crend() const noexcept {
+    return rend();
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::ConstProxyVector math::geom::Matrix<Rows, Columns>::front() const noexcept {
+    return *begin();
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::ProxyVector math::geom::Matrix<Rows, Columns>::front() noexcept {
+    return *begin();
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::ConstProxyVector math::geom::Matrix<Rows, Columns>::back() const noexcept {
+    return *(--end());
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::ProxyVector math::geom::Matrix<Rows, Columns>::back() noexcept {
+    return *(--end());
 }
 
 template <size_t Rows, size_t Columns>
 math::geom::Matrix<Rows, Columns>::Matrix(std::initializer_list<std::initializer_list<value_type>> init) {
-	// ...
-	/*size_t i = 0, j = 0;
-	for (const auto& row : init) {
-		j = 0;
-		for (const auto& val : row) {
-			(*this)[i][j] = val;
-			++j;
-		}
-		++i;
-	}*/
+    if (init.size() != Rows * Columns) {
+        // throw ?
+        return;
+    }
+    size_t i = 0, j = 0; 
+    for (const auto& row : init) {
+        if (i >= Rows) break;
+        j = 0;
+        for (const auto& el : row) {
+            if (j >= Columns) break;
+            _(i, j) = el;
+            ++j;
+        }
+        for (; j < Columns; ++j) {
+            _(i, j) = 0.0;
+        }
+        ++i;
+    }
 }
 
 template <size_t Rows, size_t Columns>
-math::geom::Matrix<Rows, Columns>& math::geom::Matrix<Rows, Columns>::operator=(const Matrix& matrix) {
+math::geom::Matrix<Rows, Columns>::Matrix(const base_container_type& container) {
+    if (container.size() != size()) {
+        // throw ?
+        return;
+    }
+    for (size_t i = 0; i < Rows * Columns; ++i) {
+        m_data[i] = container[i];
+    }
+}
+
+template <size_t Rows, size_t Columns>
+math::geom::Matrix<Rows, Columns>::Matrix(const Matrix& other) {
 	for (size_t i = 0; i < Rows * Columns; ++i) {
-		m_data[i] = matrix.m_data[i];
+		m_data[i] = other.m_data[i];
+	}
+}
+
+template <size_t Rows, size_t Columns>
+math::geom::Matrix<Rows, Columns>::Matrix(Matrix&& other) noexcept
+	: m_data(std::move(other.m_data))
+{
+}
+
+template <size_t Rows, size_t Columns>
+math::geom::Matrix<Rows, Columns>& math::geom::Matrix<Rows, Columns>::operator=(const Matrix& other) {
+    if (this == &other) return *this;
+	for (size_t i = 0; i < Rows * Columns; ++i) {
+		m_data[i] = other.m_data[i];
 	}
 	return *this;
 }
 
 template <size_t Rows, size_t Columns>
-math::geom::Matrix<Rows, Columns>& math::geom::Matrix<Rows, Columns>::operator=(Matrix&& matrix) noexcept {
-	m_data = std::move(matrix.m_data);
+math::geom::Matrix<Rows, Columns>& math::geom::Matrix<Rows, Columns>::operator=(Matrix&& other) noexcept {
+    if (this == &other) return *this;
+	m_data = std::move(other.m_data);
 	return *this;
 }
 
@@ -79,7 +174,7 @@ math::geom::Matrix<Rows, Columns>& math::geom::Matrix<Rows, Columns>::operator-=
 }
 
 template <size_t Rows, size_t Columns>
-void math::geom::Matrix<Rows, Columns>::swap(const Matrix& other) noexcept {
+void math::geom::Matrix<Rows, Columns>::swap(Matrix& other) noexcept {
 	std::swap(m_data, other.m_data);
 }
 
@@ -216,24 +311,12 @@ void math::geom::Matrix<Rows, Columns>::set(size_t row, size_t col, value_type v
 
 template <size_t Rows, size_t Columns>
 typename math::geom::Matrix<Rows, Columns>::ConstProxyVector math::geom::Matrix<Rows, Columns>::operator[](size_t row) const {
-	return { std::next(m_data, row * Columns) };
+	return ConstProxyVector(std::next(m_data.begin(), row * Columns));
 }
 
 template <size_t Rows, size_t Columns>
 typename math::geom::Matrix<Rows, Columns>::ProxyVector math::geom::Matrix<Rows, Columns>::operator[](size_t row) {
-	return { std::next(m_data, row * Columns) };
-}
-
-template <size_t Rows, size_t Columns>
-typename math::geom::Matrix<Rows, Columns>::ConstProxyVector math::geom::Matrix<Rows, Columns>::at(size_t row) const {
-	// ...
-	return { std::next(m_data, row * Columns) };
-}
-
-template <size_t Rows, size_t Columns>
-typename math::geom::Matrix<Rows, Columns>::ProxyVector math::geom::Matrix<Rows, Columns>::at(size_t row) {
-	// ...
-	return { std::next(m_data, row * Columns) };
+	return ProxyVector(std::next(m_data.begin(), row * Columns));
 }
 
 template <size_t Rows, size_t Columns>
@@ -313,19 +396,18 @@ bool math::geom::operator!=(const Matrix<Rows, Columns>& m1, const Matrix<Rows, 
 }
 
 template <size_t Rows, size_t Columns>
-math::geom::Matrix<Rows, Columns> math::geom::operator*(const Matrix<Rows, Columns>& matrix, typename Matrix<Rows, Columns>::value_type scalar) {
-	Matrix res(matrix);
-	res *= scalar;
-	return res;
+math::geom::Matrix<Rows, Columns> math::geom::operator*(Matrix<Rows, Columns> matrix, typename Matrix<Rows, Columns>::value_type scalar) {
+	matrix *= scalar;
+	return matrix;
 }
 
 template <size_t Rows, size_t Columns>
-math::geom::Matrix<Rows, Columns> math::geom::operator*(typename Matrix<Rows, Columns>::value_type scalar, const Matrix<Rows, Columns>& matrix) {
+math::geom::Matrix<Rows, Columns> math::geom::operator*(typename Matrix<Rows, Columns>::value_type scalar, Matrix<Rows, Columns> matrix) {
 	return matrix * scalar;
 }
 
 template <size_t Rows, size_t Columns>
-math::geom::Matrix<Rows, Columns> math::geom::operator/(const Matrix<Rows, Columns>& matrix, typename Matrix<Rows, Columns>::value_type scalar) {
+math::geom::Matrix<Rows, Columns> math::geom::operator/(Matrix<Rows, Columns> matrix, typename Matrix<Rows, Columns>::value_type scalar) {
 	return matrix * (1. / scalar);
 }
 
@@ -369,17 +451,15 @@ math::geom::Matrix<N, K> math::geom::operator*(const Matrix<N, M>& m1, const Mat
 }
 
 template <size_t Rows, size_t Columns>
-math::geom::Matrix<Rows, Columns> math::geom::operator+(const Matrix<Rows, Columns>& m1, const Matrix<Rows, Columns>& m2) {
-	Matrix<Rows, Columns> res(m1);
-	res += m2;
-	return res;
+math::geom::Matrix<Rows, Columns> math::geom::operator+(Matrix<Rows, Columns> m1, const Matrix<Rows, Columns>& m2) {
+	m1 += m2;
+	return m1;
 }
 
 template <size_t Rows, size_t Columns>
-math::geom::Matrix<Rows, Columns> math::geom::operator-(const Matrix<Rows, Columns>& m1, const Matrix<Rows, Columns>& m2) {
-	Matrix<Rows, Columns> res(m1);
-	res -= m2;
-	return res;
+math::geom::Matrix<Rows, Columns> math::geom::operator-(Matrix<Rows, Columns> m1, const Matrix<Rows, Columns>& m2) {
+	m1 -= m2;
+	return m1;
 }
 
 template <size_t Rows, size_t Columns>
@@ -393,7 +473,7 @@ math::geom::Matrix<N, N> math::geom::inversed(const Matrix<N, N>& matrix) {
 	auto inverse = identity_matrix<N>();
 	Matrix temp(matrix);
 
-	// œˇÏÓÈ ıÓ‰ ÏÂÚÓ‰‡ √‡ÛÒÒ‡
+	// –ü—Ä—è–º–æ–π —Ö–æ–¥ –º–µ—Ç–æ–¥–∞ –ì–∞—É—Å—Å–∞
 	for (size_t i = 0; i < n; ++i) {
 		size_t pivot = i;
 		for (size_t j = i + 1; j < n; ++j) {
@@ -459,17 +539,315 @@ math::geom::Matrix<Rows, Columns> math::geom::elementary_matrix_unit(size_t i, s
 }
 
 //////////////////////////////////////////
+//           ConstRowIterator           //
+//////////////////////////////////////////
+
+template <size_t Rows, size_t Columns>
+math::geom::Matrix<Rows, Columns>::ConstRowIterator::ConstRowIterator(const Matrix* matrix, size_t row)
+    : m_matrix(matrix)
+    , m_row(row)
+    , m_proxy(m_matrix->m_data.begin() + m_row * Columns)
+{
+    if (row >= Rows) {
+        // throw ?
+    }
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::ConstRowIterator::reference math::geom::Matrix<Rows, Columns>::ConstRowIterator::operator*() const {
+    m_proxy = m_matrix[row];
+    return m_proxy;
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::ConstRowIterator::pointer math::geom::Matrix<Rows, Columns>::ConstRowIterator::operator->() const {
+    return &(operator*());
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::ConstRowIterator& math::geom::Matrix<Rows, Columns>::ConstRowIterator::operator++() {
+    ++m_row;
+    return *this;
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::ConstRowIterator math::geom::Matrix<Rows, Columns>::ConstRowIterator::operator++(int) {
+    ConstRowIterator tmp = *this;
+    this->operator++();
+    return tmp;
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::ConstRowIterator& math::geom::Matrix<Rows, Columns>::ConstRowIterator::operator--() {
+    --m_row;
+    return *this;
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::ConstRowIterator math::geom::Matrix<Rows, Columns>::ConstRowIterator::operator--(int) {
+    ConstRowIterator tmp = *this;
+    this->operator--();
+    return tmp;
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::ConstRowIterator math::geom::Matrix<Rows, Columns>::ConstRowIterator::operator+(difference_type n) const {
+    return ConstRowIterator(m_matrix, m_row + n);
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::ConstRowIterator math::geom::Matrix<Rows, Columns>::ConstRowIterator::operator-(difference_type n) const {
+    return ConstRowIterator(m_matrix, m_row - n);
+}
+
+template <size_t Rows, size_t Columns>
+template <class Iter>
+typename math::geom::Matrix<Rows, Columns>::ConstRowIterator::difference_type math::geom::Matrix<Rows, Columns>::ConstRowIterator::operator-(const Iter& other) const {
+    return static_cast<difference_type>(m_row) - static_cast<difference_type>(other.m_row);
+}
+
+template <size_t Rows, size_t Columns>
+template <class Iter>
+bool math::geom::Matrix<Rows, Columns>::ConstRowIterator::operator==(const Iter& other) const {
+    return m_matrix == other.m_matrix && m_row == other.m_row;
+}
+
+template <size_t Rows, size_t Columns>
+template <class Iter>
+bool math::geom::Matrix<Rows, Columns>::ConstRowIterator::operator!=(const Iter& other) const {
+    return !(*this == other);
+}
+
+template <size_t Rows, size_t Columns>
+template <class Iter>
+bool math::geom::Matrix<Rows, Columns>::ConstRowIterator::operator<(const Iter& other) const {
+    return m_row < other.m_row;
+}
+
+template <size_t Rows, size_t Columns>
+template <class Iter>
+bool math::geom::Matrix<Rows, Columns>::ConstRowIterator::operator>(const Iter& other) const {
+    return m_row > other.m_row;
+}
+
+template <size_t Rows, size_t Columns>
+template <class Iter>
+bool math::geom::Matrix<Rows, Columns>::ConstRowIterator::operator<=(const Iter& other) const {
+    return m_row <= other.m_row;
+}
+
+template <size_t Rows, size_t Columns>
+template <class Iter>
+bool math::geom::Matrix<Rows, Columns>::ConstRowIterator::operator>=(const Iter& other) const {
+    return m_row >= other.m_row;
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::ConstRowIterator& math::geom::Matrix<Rows, Columns>::ConstRowIterator::operator+=(difference_type n) {
+    m_row += n;
+    return *this;
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::ConstRowIterator& math::geom::Matrix<Rows, Columns>::ConstRowIterator::operator-=(difference_type n) {
+    m_row -= n;
+    return *this;
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::ConstRowIterator::reference math::geom::Matrix<Rows, Columns>::ConstRowIterator::operator[](difference_type n) const {
+    return *(*this + n);
+}
+
+//////////////////////////////////////////
+//              RowIterator             //
+//////////////////////////////////////////
+
+template <size_t Rows, size_t Columns>
+math::geom::Matrix<Rows, Columns>::RowIterator::RowIterator(Matrix* matrix, size_t row)
+    : m_matrix(matrix)
+    , m_row(row)
+    , m_proxy(m_matrix->m_data.begin() + m_row * Columns)
+{
+    if (row >= Rows) {
+        // throw ?
+    }
+}
+
+template <size_t Rows, size_t Columns>
+typename const math::geom::Matrix<Rows, Columns>::RowIterator::reference math::geom::Matrix<Rows, Columns>::RowIterator::operator*() const {
+    m_proxy = m_matrix[m_row];
+    return m_proxy;
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::RowIterator::reference math::geom::Matrix<Rows, Columns>::RowIterator::operator*() {
+    m_proxy = ProxyVector(m_matrix->m_data.begin() + m_row * Columns);
+    return m_proxy;
+}
+
+template <size_t Rows, size_t Columns>
+typename const math::geom::Matrix<Rows, Columns>::RowIterator::pointer math::geom::Matrix<Rows, Columns>::RowIterator::operator->() const {
+    return &(operator*());
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::RowIterator::pointer math::geom::Matrix<Rows, Columns>::RowIterator::operator->() {
+    return &(operator*());
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::RowIterator& math::geom::Matrix<Rows, Columns>::RowIterator::operator++() {
+    ++m_row;
+    return *this;
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::RowIterator math::geom::Matrix<Rows, Columns>::RowIterator::operator++(int) {
+    RowIterator tmp = *this;
+    this->operator++();
+    return tmp;
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::RowIterator& math::geom::Matrix<Rows, Columns>::RowIterator::operator--() {
+    --m_row;
+    return *this;
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::RowIterator math::geom::Matrix<Rows, Columns>::RowIterator::operator--(int) {
+    RowIterator tmp = *this;
+    this->operator--();
+    return tmp;
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::RowIterator math::geom::Matrix<Rows, Columns>::RowIterator::operator+(difference_type n) const {
+    return RowIterator(m_matrix, m_row + n);
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::RowIterator math::geom::Matrix<Rows, Columns>::RowIterator::operator-(difference_type n) const {
+    return RowIterator(m_matrix, m_row - n);
+}
+
+template <size_t Rows, size_t Columns>
+template <class Iter>
+typename math::geom::Matrix<Rows, Columns>::RowIterator::difference_type math::geom::Matrix<Rows, Columns>::RowIterator::operator-(const Iter& other) const {
+    return static_cast<difference_type>(m_row) - static_cast<difference_type>(other.m_row);
+}
+
+template <size_t Rows, size_t Columns>
+template <class Iter>
+bool math::geom::Matrix<Rows, Columns>::RowIterator::operator==(const Iter& other) const {
+    return m_matrix == other.m_matrix && m_row == other.m_row;
+}
+
+template <size_t Rows, size_t Columns>
+template <class Iter>
+bool math::geom::Matrix<Rows, Columns>::RowIterator::operator!=(const Iter& other) const {
+    return !(*this == other);
+}
+
+template <size_t Rows, size_t Columns>
+template <class Iter>
+bool math::geom::Matrix<Rows, Columns>::RowIterator::operator<(const Iter& other) const {
+    return m_row < other.m_row;
+}
+
+template <size_t Rows, size_t Columns>
+template <class Iter>
+bool math::geom::Matrix<Rows, Columns>::RowIterator::operator>(const Iter& other) const {
+    return m_row > other.m_row;
+}
+
+template <size_t Rows, size_t Columns>
+template <class Iter>
+bool math::geom::Matrix<Rows, Columns>::RowIterator::operator<=(const Iter& other) const {
+    return m_row <= other.m_row;
+}
+
+template <size_t Rows, size_t Columns>
+template <class Iter>
+bool math::geom::Matrix<Rows, Columns>::RowIterator::operator>=(const Iter& other) const {
+    return m_row >= other.m_row;
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::RowIterator& math::geom::Matrix<Rows, Columns>::RowIterator::operator+=(difference_type n) {
+    m_row += n;
+    return *this;
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::RowIterator& math::geom::Matrix<Rows, Columns>::RowIterator::operator-=(difference_type n) {
+    m_row -= n;
+    return *this;
+}
+
+template <size_t Rows, size_t Columns>
+typename const math::geom::Matrix<Rows, Columns>::RowIterator::reference math::geom::Matrix<Rows, Columns>::RowIterator::operator[](difference_type n) const {
+    return *(*this + n);
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::RowIterator::reference math::geom::Matrix<Rows, Columns>::RowIterator::operator[](difference_type n) {
+    return *(*this + n);
+}
+
+//////////////////////////////////////////
 //           ConstProxyVector           //
 //////////////////////////////////////////
 
 template <size_t Rows, size_t Columns>
-math::geom::Matrix<Rows, Columns>::ConstProxyVector::const_iterator math::geom::Matrix<Rows, Columns>::ConstProxyVector::begin() const {
+typename math::geom::Matrix<Rows, Columns>::ConstProxyVector::const_iterator math::geom::Matrix<Rows, Columns>::ConstProxyVector::begin() const noexcept {
 	return m_front;
 }
 
 template <size_t Rows, size_t Columns>
-math::geom::Matrix<Rows, Columns>::ConstProxyVector::const_iterator math::geom::Matrix<Rows, Columns>::ConstProxyVector::end() const {
+typename math::geom::Matrix<Rows, Columns>::ConstProxyVector::const_iterator math::geom::Matrix<Rows, Columns>::ConstProxyVector::end() const noexcept {
 	return std::next(m_front, Columns);
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::ConstProxyVector::const_reverse_iterator math::geom::Matrix<Rows, Columns>::ConstProxyVector::rbegin() const noexcept {
+    return std::reverse_iterator(end());
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::ConstProxyVector::const_reverse_iterator math::geom::Matrix<Rows, Columns>::ConstProxyVector::rend() const noexcept {
+    return std::reverse_iterator(begin());
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::ConstProxyVector::const_iterator math::geom::Matrix<Rows, Columns>::ConstProxyVector::cbegin() const noexcept {
+    return begin();
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::ConstProxyVector::const_iterator math::geom::Matrix<Rows, Columns>::ConstProxyVector::cend() const noexcept {
+    return end();
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::ConstProxyVector::const_reverse_iterator math::geom::Matrix<Rows, Columns>::ConstProxyVector::crbegin() const noexcept {
+    return rend();
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::ConstProxyVector::const_reverse_iterator math::geom::Matrix<Rows, Columns>::ConstProxyVector::crend() const noexcept {
+    return rbegin();
+}
+
+template <size_t Rows, size_t Columns>
+typename const math::geom::Matrix<Rows, Columns>::value_type& math::geom::Matrix<Rows, Columns>::ConstProxyVector::front() const noexcept {
+    return *m_front;
+}
+
+template <size_t Rows, size_t Columns>
+typename const math::geom::Matrix<Rows, Columns>::value_type& math::geom::Matrix<Rows, Columns>::ConstProxyVector::back() const noexcept {
+    return *(--end());
 }
 
 template <size_t Rows, size_t Columns>
@@ -479,31 +857,72 @@ math::geom::Matrix<Rows, Columns>::ConstProxyVector::ConstProxyVector(const_iter
 }
 
 template <size_t Rows, size_t Columns>
-math::geom::Matrix<Rows, Columns>::ConstProxyVector::operator math::geom::Vector<Columns>() const {
-	Vector<Columns> res;
-	auto it = m_front;
-	for (size_t i = 0; i < Columns; ++i, ++it) {
-		res[i] = *it;
-	}
-	return res;
-}
-
-template <size_t Rows, size_t Columns>
-math::geom::Matrix<Rows, Columns>::value_type math::geom::Matrix<Rows, Columns>::ConstProxyVector::operator[](size_t col) const {
-	return *std::next(m_front, col);
-}
-
-template <size_t Rows, size_t Columns>
 size_t math::geom::Matrix<Rows, Columns>::ConstProxyVector::size() const {
 	return Columns;
 }
 
+template <size_t Rows, size_t Columns>
 bool math::geom::Matrix<Rows, Columns>::ConstProxyVector::empty() const {
 	return Columns == 0;
 }
 
 template <size_t Rows, size_t Columns>
-bool math::geom::operator==(const Matrix<Rows, Columns>::ConstProxyVector& v1, const Matrix<Rows, Columns>::ConstProxyVector& v2) {
+bool math::geom::Matrix<Rows, Columns>::ConstProxyVector::is_zero() const {
+    for (const auto& el : *this) {
+        if (dcmp(el) != 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+template <size_t Rows, size_t Columns>
+typename const math::geom::Matrix<Rows, Columns>::value_type& math::geom::Matrix<Rows, Columns>::ConstProxyVector::operator[](size_t col) const noexcept {
+    return *std::next(m_front, col);
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::value_type math::geom::Matrix<Rows, Columns>::ConstProxyVector::dot(const Vector<Columns>& other) const {
+    value_type res = 0;
+    auto it = m_front;
+    for (size_t i = 0; i < Columns; ++i, ++it) {
+        res += *it * other[i];
+    }
+    return res;
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::value_type math::geom::Matrix<Rows, Columns>::ConstProxyVector::dot(const ProxyVector& other) const {
+    value_type res = 0;
+    auto it = m_front;
+    for (size_t i = 0; i < Columns; ++i, ++it) {
+        res += *it * other[i];
+    }
+    return res;
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::value_type math::geom::Matrix<Rows, Columns>::ConstProxyVector::norm() const {
+    return std::sqrt(dot(*this));
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::value_type math::geom::Matrix<Rows, Columns>::ConstProxyVector::length() const {
+    return norm();
+}
+
+template <size_t Rows, size_t Columns>
+math::geom::Matrix<Rows, Columns>::ConstProxyVector::operator math::geom::Vector<Columns>() const {
+    Vector<Columns> res;
+    auto it = m_front;
+    for (size_t i = 0; i < Columns; ++i, ++it) {
+        res[i] = *it;
+    }
+    return res;
+}
+
+template <size_t Rows, size_t Columns>
+bool math::geom::operator==(typename const Matrix<Rows, Columns>::ConstProxyVector& v1, typename const Matrix<Rows, Columns>::ConstProxyVector& v2) {
 	if (&v1 == &v2)
 		return true;
 	if (v1.size() != v2.size())
@@ -517,7 +936,7 @@ bool math::geom::operator==(const Matrix<Rows, Columns>::ConstProxyVector& v1, c
 }
 
 template <size_t Rows, size_t Columns>
-bool math::geom::operator!=(const Matrix<Rows, Columns>::ConstProxyVector& v1, const Matrix<Rows, Columns>::ConstProxyVector& v2) {
+bool math::geom::operator!=(typename const Matrix<Rows, Columns>::ConstProxyVector& v1, typename const Matrix<Rows, Columns>::ConstProxyVector& v2) {
 	return !(v1 == v2);
 }
 
@@ -526,23 +945,63 @@ bool math::geom::operator!=(const Matrix<Rows, Columns>::ConstProxyVector& v1, c
 //////////////////////////////////////////
 
 template <size_t Rows, size_t Columns>
-math::geom::Matrix<Rows, Columns>::ProxyVector::const_iterator math::geom::Matrix<Rows, Columns>::ProxyVector::begin() const {
+typename math::geom::Matrix<Rows, Columns>::ProxyVector::const_iterator math::geom::Matrix<Rows, Columns>::ProxyVector::begin() const noexcept {
 	return m_front;
 }
 
 template <size_t Rows, size_t Columns>
-math::geom::Matrix<Rows, Columns>::ProxyVector::const_iterator math::geom::Matrix<Rows, Columns>::ProxyVector::end() const {
+typename math::geom::Matrix<Rows, Columns>::ProxyVector::const_iterator math::geom::Matrix<Rows, Columns>::ProxyVector::end() const noexcept {
 	return std::next(m_front, Columns);
 }
 
 template <size_t Rows, size_t Columns>
-math::geom::Matrix<Rows, Columns>::ProxyVector::iterator math::geom::Matrix<Rows, Columns>::ProxyVector::begin() {
+typename math::geom::Matrix<Rows, Columns>::ProxyVector::iterator math::geom::Matrix<Rows, Columns>::ProxyVector::begin() noexcept {
 	return m_front;
 }
 
 template <size_t Rows, size_t Columns>
-math::geom::Matrix<Rows, Columns>::ProxyVector::iterator math::geom::Matrix<Rows, Columns>::ProxyVector::end() {
+typename math::geom::Matrix<Rows, Columns>::ProxyVector::iterator math::geom::Matrix<Rows, Columns>::ProxyVector::end() noexcept {
 	return std::next(m_front, Columns);
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::ProxyVector::reverse_iterator math::geom::Matrix<Rows, Columns>::ProxyVector::rbegin() noexcept {
+    return std::reverse_iterator(end());
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::ProxyVector::const_reverse_iterator math::geom::Matrix<Rows, Columns>::ProxyVector::rbegin() const noexcept {
+    return std::reverse_iterator(end());
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::ProxyVector::reverse_iterator math::geom::Matrix<Rows, Columns>::ProxyVector::rend() noexcept {
+    return std::reverse_iterator(begin());
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::ProxyVector::const_reverse_iterator math::geom::Matrix<Rows, Columns>::ProxyVector::rend() const noexcept {
+    return std::reverse_iterator(begin());
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::ProxyVector::const_iterator math::geom::Matrix<Rows, Columns>::ProxyVector::cbegin() const noexcept {
+    return begin();
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::ProxyVector::const_iterator math::geom::Matrix<Rows, Columns>::ProxyVector::cend() const noexcept {
+    return end();
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::ProxyVector::const_reverse_iterator math::geom::Matrix<Rows, Columns>::ProxyVector::crbegin() const noexcept {
+    return rbegin();
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::ProxyVector::const_reverse_iterator math::geom::Matrix<Rows, Columns>::ProxyVector::crend() const noexcept {
+    return rend();
 }
 
 template <size_t Rows, size_t Columns>
@@ -552,32 +1011,134 @@ math::geom::Matrix<Rows, Columns>::ProxyVector::ProxyVector(iterator front)
 }
 
 template <size_t Rows, size_t Columns>
-math::geom::Matrix<Rows, Columns>::ProxyVector::operator math::geom::Vector<Columns>() const {
-	Vector<Columns> res;
-	auto it = m_front;
-	for (size_t i = 0; i < Columns; ++i, ++it) {
-		res[i] = *it;
-	}
-	return res;
+math::geom::Matrix<Rows, Columns>::ProxyVector::ProxyVector(const ConstProxyVector& proxy)
+    : m_front(proxy.m_front)
+{
 }
 
-math::geom::Matrix<Rows, Columns>::value_type math::geom::Matrix<Rows, Columns>::ProxyVector::operator[](size_t col) const {
-	return *std::next(m_front, col);
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::ProxyVector& math::geom::Matrix<Rows, Columns>::ProxyVector::operator*=(value_type scalar) {
+    for (auto& el : *this) {
+        el *= scalar;
+    }
 }
 
-math::geom::Matrix<Rows, Columns>::value_type& math::geom::Matrix<Rows, Columns>::ProxyVector::operator[](size_t col) {
-	return *std::next(m_front, col);
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::ProxyVector& math::geom::Matrix<Rows, Columns>::ProxyVector::operator/=(value_type scalar) {
+    for (auto& el : *this) {
+        el /= scalar;
+    }
 }
 
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::ProxyVector& math::geom::Matrix<Rows, Columns>::ProxyVector::operator+=(const ProxyVector& other) {
+    auto it1 = m_front;
+    auto it2 = other.m_front;
+    for (size_t i = 0; i < Columns; ++i, ++it1, ++it2) {
+        it1 += it2;
+    }
+    return *this;
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::ProxyVector& math::geom::Matrix<Rows, Columns>::ProxyVector::operator-=(const ProxyVector& other) {
+    auto it1 = m_front;
+    auto it2 = other.m_front;
+    for (size_t i = 0; i < Columns; ++i, ++it1, ++it2) {
+        it1 -= it2;
+    }
+    return *this;
+}
+
+template <size_t Rows, size_t Columns>
 size_t math::geom::Matrix<Rows, Columns>::ProxyVector::size() const {
 	return Columns;
 }
 
+template <size_t Rows, size_t Columns>
 bool math::geom::Matrix<Rows, Columns>::ProxyVector::empty() const {
 	return Columns == 0;
 }
 
-bool math::geom::operator==(const Matrix<Rows, Columns>::ProxyVector& v1, const Matrix<Rows, Columns>::ProxyVector& v2) {
+template <size_t Rows, size_t Columns>
+void math::geom::Matrix<Rows, Columns>::ProxyVector::fill(value_type value) {
+    for (auto& el : *this) {
+        el = value;
+    }
+}
+
+template <size_t Rows, size_t Columns>
+bool math::geom::Matrix<Rows, Columns>::ProxyVector::is_zero() const {
+    for (const auto& el : *this) {
+        if (dcmp(el) != 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+template <size_t Rows, size_t Columns>
+typename const math::geom::Matrix<Rows, Columns>::value_type& math::geom::Matrix<Rows, Columns>::ProxyVector::operator[](size_t col) const noexcept {
+    return *std::next(m_front, col);
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::value_type& math::geom::Matrix<Rows, Columns>::ProxyVector::operator[](size_t col) noexcept {
+    return *std::next(m_front, col);
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::value_type math::geom::Matrix<Rows, Columns>::ProxyVector::dot(const Vector<Columns>& other) const {
+    value_type res = 0;
+    auto it = m_front;
+    for (size_t i = 0; i < Columns; ++i, ++it) {
+        res += *it * other[i];
+    }
+    return res;
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::value_type math::geom::Matrix<Rows, Columns>::ProxyVector::dot(const ProxyVector& other) const {
+    value_type res = 0;
+    auto it = m_front;
+    for (size_t i = 0; i < Columns; ++i, ++it) {
+        res += *it * other[i];
+    }
+    return res;
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::value_type math::geom::Matrix<Rows, Columns>::ProxyVector::norm() const {
+    return std::sqrt(dot(*this));
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::value_type math::geom::Matrix<Rows, Columns>::ProxyVector::length() const {
+    return norm();
+}
+
+template <size_t Rows, size_t Columns>
+typename math::geom::Matrix<Rows, Columns>::ProxyVector& math::geom::Matrix<Rows, Columns>::ProxyVector::normalize() {
+    if (value_type len = norm(); dcmp(len) != 0) {
+        for (auto& el : *this) {
+            el /= len;
+        }
+    }
+    return *this;
+}
+
+template <size_t Rows, size_t Columns>
+math::geom::Matrix<Rows, Columns>::ProxyVector::operator math::geom::Vector<Columns>() const {
+    Vector<Columns> res;
+    auto it = m_front;
+    for (size_t i = 0; i < Columns; ++i, ++it) {
+        res[i] = *it;
+    }
+    return res;
+}
+
+template <size_t Rows, size_t Columns>
+bool math::geom::operator==(typename const Matrix<Rows, Columns>::ProxyVector& v1, typename const Matrix<Rows, Columns>::ProxyVector& v2) {
 	if (&v1 == &v2)
 		return true;
 	if (v1.size() != v2.size())
@@ -590,6 +1151,7 @@ bool math::geom::operator==(const Matrix<Rows, Columns>::ProxyVector& v1, const 
 	return true;
 }
 
-bool math::geom::operator!=(const Matrix<Rows, Columns>::ProxyVector& v1, const Matrix<Rows, Columns>::ProxyVector& v2) {
+template <size_t Rows, size_t Columns>
+bool math::geom::operator!=(typename const Matrix<Rows, Columns>::ProxyVector& v1, typename const Matrix<Rows, Columns>::ProxyVector& v2) {
 	return !(v1 == v2);
 }

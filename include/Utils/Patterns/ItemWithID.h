@@ -1,6 +1,6 @@
 #pragma once
 
-namespace patterns {
+namespace pattern {
 
     class ItemWithID {
     public:
@@ -10,4 +10,4 @@ namespace patterns {
         const char* m_id;
     };
 
-} // namespace patterns
+} // namespace pattern

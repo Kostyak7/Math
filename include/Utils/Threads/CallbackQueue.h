@@ -3,7 +3,7 @@
 #include "BlockingQueue.h"
 #include "IStoppableCallbackQueue.h"
 
-namespace fem {
+namespace util::mthrd {
 
     class CallbackQueue : public IStoppableCallbackQueue,
                           public std::enable_shared_from_this<CallbackQueue> {
@@ -65,4 +65,4 @@ namespace fem {
         std::atomic<std::thread::id> m_therad_id;
     };
 
-} // namespace fem
+} // namespace util::mthrd

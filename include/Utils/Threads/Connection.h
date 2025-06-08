@@ -3,7 +3,7 @@
 #include <list>
 #include <mutex>
 
-namespace fem {
+namespace util::mthrd {
 
     /**
      * @brief Отслеживает соединение InitiatorType c владельцем.
@@ -42,6 +42,6 @@ namespace fem {
         size_t m_depth = 0;
     };
 
-} // namespace fem
+} // namespace util::mthrd
 
 #include "Connection.tpp"

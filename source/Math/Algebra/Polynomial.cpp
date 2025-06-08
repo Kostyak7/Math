@@ -45,25 +45,25 @@ bool math::algebra::Polynomial::operator!=(const Polynomial& other) const {
     return !(*this == other);
 }
 
-math::algebra::Polynomial math::algebra::Polynomial::operator+=(const Polynomial& other) const {
+math::algebra::Polynomial& math::algebra::Polynomial::operator+=(const Polynomial& other) {
     for (const auto& [deg, coef] : other.m_coeffs) {
         m_coeffs[deg] += coef;
-        if (dcmp(result.m_coeffs[deg]) == 0)
-            result.m_coeffs.erase(deg);
+        if (dcmp(m_coeffs[deg]) == 0)
+            m_coeffs.erase(deg);
     }
     return *this;
 }
 
-math::algebra::Polynomial& math::algebra::Polynomial::operator-=(const Polynomial& other) const {
+math::algebra::Polynomial& math::algebra::Polynomial::operator-=(const Polynomial& other) {
     for (const auto& [deg, coef] : other.m_coeffs) {
         m_coeffs[deg] -= coef;
-        if (dcmp(result.m_coeffs[deg]) == 0)
-            result.m_coeffs.erase(deg);
+        if (dcmp(m_coeffs[deg]) == 0)
+            m_coeffs.erase(deg);
     }
     return *this;
 }
 
-math::algebra::Polynomial& math::algebra::Polynomial::operator*=(const Polynomial& other) const {
+math::algebra::Polynomial& math::algebra::Polynomial::operator*=(const Polynomial& other) {
     if (other.m_coeffs.empty()) {
         m_coeffs.clear();
         return *this;
@@ -99,7 +99,7 @@ std::pair<math::algebra::Polynomial, math::algebra::Polynomial> math::algebra::P
         int deg_diff = remainder.degree() - other.degree();
         value_type coef_ratio = remainder.get_coeff(remainder.degree()) / other.get_coeff(other.degree());
 
-        Polynomial term({ {deg_diff, coef_ratio} });
+        Polynomial term(std::map<int, value_type>{ {deg_diff, coef_ratio} });
         quotient = quotient + term;
         remainder = remainder - (term * other);
     }
